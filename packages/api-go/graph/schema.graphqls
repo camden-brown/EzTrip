@@ -1,0 +1,14 @@
+# GraphQL Schema
+
+type User {
+  id: ID!
+  firstName: String!
+  lastName: String!
+  email: String!
+}
+
+type Query {
+  hello: String!
+  users: [User!]!
+  user(id: ID!): User
+}

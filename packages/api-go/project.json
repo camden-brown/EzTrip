@@ -1,0 +1,52 @@
+{
+  "name": "api-go",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "packages/api-go",
+  "projectType": "application",
+  "tags": ["type:api", "lang:go"],
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run main.go",
+        "cwd": "packages/api-go"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go build -o dist/api-go main.go",
+        "cwd": "packages/api-go"
+      },
+      "outputs": ["{workspaceRoot}/packages/api-go/dist"]
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go test ./...",
+        "cwd": "packages/api-go"
+      }
+    },
+    "lint": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go vet ./...",
+        "cwd": "packages/api-go"
+      }
+    },
+    "tidy": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go mod tidy",
+        "cwd": "packages/api-go"
+      }
+    },
+    "generate": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run github.com/99designs/gqlgen generate",
+        "cwd": "packages/api-go"
+      }
+    }
+  }
+}
