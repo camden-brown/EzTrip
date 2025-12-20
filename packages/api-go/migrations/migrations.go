@@ -1,8 +1,7 @@
 package migrations
 
 import (
-	"log"
-
+	"travel-app/api-go/logger"
 	"travel-app/api-go/user"
 
 	"gorm.io/gorm"
@@ -10,7 +9,7 @@ import (
 
 // RunMigrations applies all database schema migrations
 func RunMigrations(db *gorm.DB) error {
-	log.Println("Running database migrations...")
+	logger.Log.Info("Running database migrations...")
 
 	// AutoMigrate will create tables, missing columns and indexes
 	// It will NOT delete columns or change column types
@@ -23,6 +22,6 @@ func RunMigrations(db *gorm.DB) error {
 		return err
 	}
 
-	log.Println("Migrations completed successfully")
+	logger.Log.Info("Migrations completed successfully")
 	return nil
 }

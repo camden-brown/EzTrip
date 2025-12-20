@@ -1,10 +1,10 @@
 package seeds
 
 import (
-	"log"
-
+	"travel-app/api-go/logger"
 	"travel-app/api-go/user"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -13,11 +13,11 @@ func SeedUsers(db *gorm.DB) error {
 	var count int64
 	db.Model(&user.User{}).Count(&count)
 	if count > 0 {
-		log.Println("Users already seeded, skipping...")
+		logger.Log.Info("Users already seeded, skipping...")
 		return nil
 	}
 
-	log.Println("Seeding users...")
+	logger.Log.Info("Seeding users...")
 
 	users := []user.User{
 		{FirstName: "John", LastName: "Doe", Email: "john@example.com"},
@@ -28,10 +28,13 @@ func SeedUsers(db *gorm.DB) error {
 
 	for _, u := range users {
 		if err := db.Create(&u).Error; err != nil {
-			log.Printf("Warning: Failed to seed user %s: %v", u.Email, err)
+			logger.Log.WithFields(logrus.Fields{
+				"email": u.Email,
+				"error": err,
+			}).Warn("Failed to seed user")
 		}
 	}
 
-	log.Printf("Successfully seeded %d users", len(users))
+	logger.Log.WithField("count", len(users)).Info("Successfully seeded users")
 	return nil
 }

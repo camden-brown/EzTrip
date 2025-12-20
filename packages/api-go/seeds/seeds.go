@@ -1,7 +1,7 @@
 package seeds
 
 import (
-	"log"
+	"travel-app/api-go/logger"
 
 	"gorm.io/gorm"
 )
@@ -9,7 +9,7 @@ import (
 // RunSeeds populates the database with sample data (development only).
 // Add new seed functions here as you create more models.
 func RunSeeds(db *gorm.DB) error {
-	log.Println("Running database seeds...")
+	logger.Log.Info("Running database seeds...")
 
 	// Seed users
 	if err := SeedUsers(db); err != nil {
@@ -21,6 +21,6 @@ func RunSeeds(db *gorm.DB) error {
 	//     return err
 	// }
 
-	log.Println("All seeds completed successfully")
+	logger.Log.Info("All seeds completed successfully")
 	return nil
 }

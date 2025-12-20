@@ -1,13 +1,14 @@
 package main
 
 import (
-	"log"
 	"net/http"
 	"os"
 	"strings"
 
 	"travel-app/api-go/db"
 	"travel-app/api-go/graph"
+	"travel-app/api-go/logger"
+	"travel-app/api-go/middleware"
 	"travel-app/api-go/migrations"
 	"travel-app/api-go/seeds"
 
@@ -27,28 +28,33 @@ func main() {
 	dbConfig := db.GetConfigFromEnv()
 	database, err := db.NewGormDB(dbConfig)
 	if err != nil {
-		log.Fatalf("Failed to connect to database: %v", err)
+		logger.Log.Fatalf("Failed to connect to database: %v", err)
 	}
 
-	log.Println("Successfully connected to PostgreSQL with GORM")
+	logger.Log.Info("Successfully connected to PostgreSQL with GORM")
 
 	// Run migrations
 	if err := migrations.RunMigrations(database); err != nil {
-		log.Fatalf("Failed to run migrations: %v", err)
+		logger.Log.Fatalf("Failed to run migrations: %v", err)
 	}
 
 	// Run seeds (only in development)
 	if os.Getenv("SEED_DATA") == "true" {
 		if err := seeds.RunSeeds(database); err != nil {
-			log.Printf("Warning: Failed to run seeds: %v", err)
+			logger.Log.Warnf("Failed to run seeds: %v", err)
 		}
 	}
 
-	router := gin.Default()
+	router := gin.New() // Use gin.New() instead of gin.Default() to configure custom middleware
+
+	// Add middleware
+	router.Use(gin.Recovery())             // Recover from panics
+	router.Use(middleware.RequestLogger()) // Structured request logging
+	router.Use(middleware.ErrorHandler())  // Error handling
 
 	// Configure CORS
 	corsConfig := cors.DefaultConfig()
-	
+
 	// Get allowed origins from environment variable
 	allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
 	if allowedOrigins != "" {
@@ -57,12 +63,12 @@ func main() {
 		// Default: allow all origins in development (use specific origins in production)
 		corsConfig.AllowAllOrigins = true
 	}
-	
+
 	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
 	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	corsConfig.ExposeHeaders = []string{"Content-Length"}
 	corsConfig.AllowCredentials = true
-	
+
 	router.Use(cors.New(corsConfig))
 
 	// Health check endpoint
@@ -90,5 +96,6 @@ func main() {
 		playgroundHandler.ServeHTTP(c.Writer, c.Request)
 	})
 
+	logger.Log.Info("Starting server on :8080")
 	router.Run(":8080")
 }
