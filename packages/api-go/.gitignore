@@ -7,11 +7,30 @@
 api-go
 dist/
 
-# Test binary
+# Test binary and coverage
 *.test
-
-# Output of the go coverage tool
 *.out
 
 # Go workspace file
 go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# Go module cache
+go.sum.backup
+
+# IDE and editor files
+*.swp
+*.swo
+*~
+.idea/
+
+# Debug and profiling
+*.prof
+*.pprof
+__debug_bin
+
+# Air live reload (if used)
+tmp/
