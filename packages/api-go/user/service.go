@@ -49,8 +49,14 @@ func (s *Service) GetByID(ctx context.Context, id string) (*User, error) {
 	return &user, nil
 }
 
-func (s *Service) Create(ctx context.Context, user *User) (*User, error) {
-	result := s.db.WithContext(ctx).Create(user)
+func (s *Service) Create(ctx context.Context, input CreateUserInput) (*User, error) {
+	user := User{
+		FirstName: input.FirstName,
+		LastName:  input.LastName,
+		Email:     input.Email,
+	}
+
+	result := s.db.WithContext(ctx).Create(&user)
 	if result.Error != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"email": user.Email,
@@ -62,12 +68,13 @@ func (s *Service) Create(ctx context.Context, user *User) (*User, error) {
 		"id":    user.ID,
 		"email": user.Email,
 	}).Info("User created successfully")
-	return user, nil
+	return &user, nil
 }
 
-func (s *Service) Update(ctx context.Context, id string, updates map[string]interface{}) (*User, error) {
+func (s *Service) Update(ctx context.Context, id string, input UpdateUserInput) (*User, error) {
 	var user User
-	result := s.db.WithContext(ctx).Model(&user).Where("id = ?", id).Updates(updates)
+
+	result := s.db.WithContext(ctx).Model(&user).Where("id = ?", id).Updates(input)
 	if result.Error != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"id":    id,
@@ -76,8 +83,14 @@ func (s *Service) Update(ctx context.Context, id string, updates map[string]inte
 		return nil, result.Error
 	}
 
-	// Fetch updated user
-	s.db.WithContext(ctx).Where("id = ?", id).First(&user)
+	if err := s.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"id":    id,
+			"error": err,
+		}).Error("Failed to fetch updated user")
+		return nil, err
+	}
+
 	logger.Log.WithField("id", id).Info("User updated successfully")
 	return &user, nil
 }
