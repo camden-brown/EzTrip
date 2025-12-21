@@ -10,7 +10,6 @@ import (
 	"travel-app/api-go/logger"
 	"travel-app/api-go/middleware"
 	"travel-app/api-go/migrations"
-	"travel-app/api-go/seeds"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
@@ -36,13 +35,6 @@ func main() {
 	// Run migrations
 	if err := migrations.RunMigrations(database); err != nil {
 		logger.Log.Fatalf("Failed to run migrations: %v", err)
-	}
-
-	// Run seeds (only in development)
-	if os.Getenv("SEED_DATA") == "true" {
-		if err := seeds.RunSeeds(database); err != nil {
-			logger.Log.Warnf("Failed to run seeds: %v", err)
-		}
 	}
 
 	router := gin.New() // Use gin.New() instead of gin.Default() to configure custom middleware

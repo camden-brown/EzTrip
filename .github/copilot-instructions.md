@@ -95,7 +95,8 @@ models:
 - Each model gets its own seed file: `seeds/{model}_seeds.go`
 - Include idempotency checks (count existing records)
 - Orchestrate in `seeds/seeds.go` with `RunSeeds(db)`
-- Control via `SEED_DATA=true` environment variable
+- Seeds run during Docker setup via `seed-init` service, not on server startup
+- Run manually with: `npx nx run api-go:seed`
 
 ### Error Handling
 
@@ -153,10 +154,9 @@ Development (docker-compose.yml):
 - `DB_USER=postgres`
 - `DB_PASSWORD=postgres`
 - `DB_NAME=travel_app`
-- `GIN_MODE=release`
-- `SEED_DATA=true` (development only)
+- `GIN_MODE=debug` (development mode)
 
-Production: Set `SEED_DATA=false` or omit entirely
+Production: Use `GIN_MODE=release`
 
 ## Nx Commands
 
@@ -166,15 +166,17 @@ Production: Set `SEED_DATA=false` or omit entirely
 - `npx nx run api-go:lint` - Run go vet
 - `npx nx run api-go:tidy` - Run go mod tidy
 - `npx nx run api-go:generate` - Generate GraphQL code
+- `npx nx run api-go:seed` - Run database seeds manually
 
 ## Docker
 
-- Development: `docker-compose up -d`
+- Development: `docker-compose up -d` (seeds run automatically via seed-init service)
 - Rebuild: `docker-compose up -d --build`
 - Logs: `docker-compose logs -f api`
+- Seed logs: `docker-compose logs seed-init`
 - Stop: `docker-compose down`
 
-Multi-stage Dockerfile builds optimized binary from source.
+Multi-stage Dockerfile builds optimized binary from source. The `seed-init` service runs once during startup to populate the database.
 
 ## Important Notes
 
@@ -183,6 +185,7 @@ Multi-stage Dockerfile builds optimized binary from source.
 - **Context is required** - all service methods take `context.Context`
 - **Use GORM methods** - no raw SQL unless absolutely necessary
 - **Idempotent seeds** - always check if data exists before inserting
+- **Seeds run during Docker setup** - not on server startup (use `seed-init` service)
 - **UUID primary keys** - use `type:uuid;default:gen_random_uuid()`
 - **Soft deletes** - include `DeletedAt gorm.DeletedAt` in models
 

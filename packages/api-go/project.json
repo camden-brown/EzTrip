@@ -47,6 +47,13 @@
         "command": "go run github.com/99designs/gqlgen generate",
         "cwd": "packages/api-go"
       }
+    },
+    "seed": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "go run cmd/seed/main.go",
+        "cwd": "packages/api-go"
+      }
     }
   }
 }

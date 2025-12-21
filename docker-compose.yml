@@ -18,6 +18,27 @@ services:
     networks:
       - travel-app-network
 
+  seed-init:
+    build:
+      context: ./packages/api-go
+      dockerfile: Dockerfile.dev
+    container_name: travel-app-seed-init
+    volumes:
+      - ./packages/api-go:/app
+    environment:
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: travel_app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - travel-app-network
+    command: go run cmd/seed/main.go
+    restart: "no" # Run once and exit
+
   api:
     build:
       context: ./packages/api-go
@@ -33,13 +54,14 @@ services:
       DB_PASSWORD: postgres
       DB_NAME: travel_app
       GIN_MODE: debug # debug mode for local development
-      SEED_DATA: "true"
       # CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:4200"  # Comma-separated list
     ports:
       - "8080:8080"
     depends_on:
       postgres:
         condition: service_healthy
+      seed-init:
+        condition: service_completed_successfully
     networks:
       - travel-app-network
     command: air -c .air.toml
