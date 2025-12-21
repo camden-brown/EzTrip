@@ -20,11 +20,11 @@ services:
 
   seed-init:
     build:
-      context: ./packages/api-go
+      context: ./apps/api-go
       dockerfile: Dockerfile.dev
     container_name: travel-app-seed-init
     volumes:
-      - ./packages/api-go:/app
+      - ./apps/api-go:/app
     environment:
       DB_HOST: postgres
       DB_PORT: 5432
@@ -41,11 +41,11 @@ services:
 
   api:
     build:
-      context: ./packages/api-go
+      context: ./apps/api-go
       dockerfile: Dockerfile.dev
     container_name: travel-app-api
     volumes:
-      - ./packages/api-go:/app
+      - ./apps/api-go:/app
       - /app/tmp # Exclude tmp directory from sync
     environment:
       DB_HOST: postgres
