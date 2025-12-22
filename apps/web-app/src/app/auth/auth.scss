@@ -1,0 +1,57 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 31.25rem;
+  padding: 2rem;
+  border-radius: 1.5rem;
+  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.12);
+
+  mat-card-header {
+    padding-bottom: 1.5rem;
+    margin-bottom: 0;
+
+    .header-content {
+      text-align: center;
+      width: 100%;
+
+      h1 {
+        font: var(--mat-sys-display-medium);
+        color: var(--mat-sys-primary);
+        margin: 0 0 0.5rem;
+        font-weight: 700;
+      }
+
+      .subtitle {
+        font: var(--mat-sys-body-large);
+        color: var(--mat-sys-on-surface-variant);
+        margin: 0;
+      }
+    }
+  }
+
+  mat-card-content {
+    padding: 0;
+  }
+}
+
+@media (max-width: 37.5rem) {
+  .auth-container {
+    padding: 1rem;
+  }
+
+  .auth-card {
+    padding: 1.5rem;
+
+    mat-card-header .header-content h1 {
+      font: var(--mat-sys-display-small);
+    }
+  }
+}

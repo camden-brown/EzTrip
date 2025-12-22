@@ -1,0 +1,157 @@
+@use '@angular/material' as mat;
+
+// Define custom color palettes based on your Material Theme Builder export
+$eztrip-primary-palette: (
+  0: #000000,
+  10: #102000,
+  20: #1f3701,
+  25: #264300,
+  30: #2f4f00,
+  35: #354e16,
+  40: #4c662b,
+  50: #518500,
+  60: #64a104,
+  70: #7dbd2a,
+  80: #97d945,
+  90: #b1d18a,
+  95: #cdeda3,
+  98: #f0ffd7,
+  99: #f9ffe9,
+  100: #ffffff,
+  contrast: (
+    0: #ffffff,
+    10: #ffffff,
+    20: #ffffff,
+    25: #ffffff,
+    30: #ffffff,
+    35: #ffffff,
+    40: #ffffff,
+    50: #ffffff,
+    60: #000000,
+    70: #000000,
+    80: #000000,
+    90: #1f3701,
+    95: #354e16,
+    98: #354e16,
+    99: #354e16,
+    100: #354e16,
+  ),
+);
+
+$eztrip-tertiary-palette: (
+  0: #000000,
+  10: #00201e,
+  20: #003735,
+  25: #004340,
+  30: #00504c,
+  35: #1f4e4b,
+  40: #386663,
+  50: #30837f,
+  60: #4d9d98,
+  70: #69b8b3,
+  80: #85d4cf,
+  90: #a0d0cb,
+  95: #bcece7,
+  98: #e3fffc,
+  99: #f2fffd,
+  100: #ffffff,
+  contrast: (
+    0: #ffffff,
+    10: #ffffff,
+    20: #ffffff,
+    25: #ffffff,
+    30: #ffffff,
+    35: #ffffff,
+    40: #ffffff,
+    50: #ffffff,
+    60: #000000,
+    70: #000000,
+    80: #000000,
+    90: #003735,
+    95: #1f4e4b,
+    98: #1f4e4b,
+    99: #1f4e4b,
+    100: #1f4e4b,
+  ),
+);
+
+// Apply theme using modern Material 3 API (v19+)
+html {
+  // Enable system preference-based light/dark mode
+  color-scheme: light dark;
+
+  // Include Material theme with custom colors and typography
+  @include mat.theme(
+    (
+      color: (
+        primary: $eztrip-primary-palette,
+        tertiary: $eztrip-tertiary-palette,
+      ),
+      typography: (
+        plain-family: 'Roboto',
+        brand-family: 'Roboto',
+        bold-weight: 700,
+        medium-weight: 500,
+        regular-weight: 400,
+      ),
+      density: 0,
+    )
+  );
+}
+
+// Apply default surface colors
+body {
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+// Typography styles for standard HTML elements
+h1 {
+  font: var(--mat-sys-display-large);
+  margin: 0 0 16px;
+}
+
+h2 {
+  font: var(--mat-sys-display-medium);
+  margin: 0 0 16px;
+}
+
+h3 {
+  font: var(--mat-sys-display-small);
+  margin: 0 0 16px;
+}
+
+h4 {
+  font: var(--mat-sys-headline-large);
+  margin: 0 0 16px;
+}
+
+h5 {
+  font: var(--mat-sys-headline-medium);
+  margin: 0 0 12px;
+}
+
+h6 {
+  font: var(--mat-sys-headline-small);
+  margin: 0 0 12px;
+}
+
+p {
+  font: var(--mat-sys-body-large);
+  margin: 0 0 12px;
+}
+
+small {
+  font: var(--mat-sys-body-small);
+}
+
+a {
+  color: var(--mat-sys-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

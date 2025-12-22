@@ -5,6 +5,11 @@
   "prefix": "eztrip",
   "sourceRoot": "apps/web-app/src",
   "tags": [],
+  "generators": {
+    "@nx/angular:component": {
+      "style": "scss"
+    }
+  },
   "targets": {
     "build": {
       "executor": "@angular/build:application",
@@ -19,7 +24,7 @@
             "input": "apps/web-app/public"
           }
         ],
-        "styles": ["apps/web-app/src/styles.css"],
+        "styles": ["apps/web-app/src/styles.scss"],
         "server": "apps/web-app/src/main.server.ts",
         "ssr": {
           "entry": "apps/web-app/src/server.ts"
