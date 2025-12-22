@@ -7,7 +7,6 @@
       formControlName="email"
       placeholder="you@example.com"
     />
-    <mat-icon matPrefix>email</mat-icon>
     @if (loginForm.get('email')?.hasError('email') &&
     loginForm.get('email')?.touched) {
     <mat-error>Please enter a valid email address</mat-error>
@@ -25,7 +24,6 @@
       formControlName="password"
       placeholder="Enter your password"
     />
-    <mat-icon matPrefix>lock</mat-icon>
     <button
       mat-icon-button
       matSuffix
@@ -47,12 +45,11 @@
   </mat-form-field>
 
   <div class="form-options">
-    <mat-checkbox formControlName="rememberMe">Remember me</mat-checkbox>
-    <a href="#" class="forgot-password">Forgot password?</a>
+    <a href="#" class="forgot-password">Forgot your password?</a>
   </div>
 
   <button
-    mat-raised-button
+    mat-flat-button
     color="primary"
     type="submit"
     class="full-width submit-button"

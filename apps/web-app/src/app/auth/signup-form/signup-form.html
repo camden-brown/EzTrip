@@ -8,7 +8,6 @@
         formControlName="firstName"
         placeholder="John"
       />
-      <mat-icon matPrefix>person</mat-icon>
       @if (signupForm.get('firstName')?.hasError('required') &&
       signupForm.get('firstName')?.touched) {
       <mat-error>First name is required</mat-error>
@@ -38,7 +37,6 @@
       formControlName="email"
       placeholder="you@example.com"
     />
-    <mat-icon matPrefix>email</mat-icon>
     @if (signupForm.get('email')?.hasError('email') &&
     signupForm.get('email')?.touched) {
     <mat-error>Please enter a valid email address</mat-error>
@@ -56,7 +54,6 @@
       formControlName="password"
       placeholder="Create a password"
     />
-    <mat-icon matPrefix>lock</mat-icon>
     <button
       mat-icon-button
       matSuffix
@@ -85,7 +82,6 @@
       formControlName="confirmPassword"
       placeholder="Confirm your password"
     />
-    <mat-icon matPrefix>lock</mat-icon>
     <button
       mat-icon-button
       matSuffix
@@ -105,7 +101,7 @@
   </mat-form-field>
 
   <button
-    mat-raised-button
+    mat-flat-button
     color="primary"
     type="submit"
     class="full-width submit-button"

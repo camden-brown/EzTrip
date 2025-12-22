@@ -15,12 +15,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 
 export interface LoginCredentials {
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 @Component({
@@ -32,7 +30,6 @@ export interface LoginCredentials {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatCheckboxModule,
   ],
   templateUrl: './login-form.html',
   styleUrl: './login-form.scss',
@@ -49,7 +46,6 @@ export class LoginForm {
       Validators.required,
       Validators.minLength(8),
     ]),
-    rememberMe: new FormControl(false),
   });
 
   onSubmit() {

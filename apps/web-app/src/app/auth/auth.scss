@@ -1,57 +1,222 @@
 .auth-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
   min-height: 100vh;
-  padding: 1.25rem;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
 }
 
-.auth-card {
-  width: 100%;
-  max-width: 31.25rem;
+// Left side - Branding panel
+.auth-branding {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #253a57 100%);
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(
+      circle,
+      rgba(0, 172, 193, 0.1) 0%,
+      transparent 50%
+    );
+    animation: pulse 15s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(5%, 5%);
+    }
+  }
+}
+
+.branding-content {
+  position: relative;
+  z-index: 1;
+  color: #ffffff;
+  max-width: 28rem;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+
+  .logo-icon {
+    font-size: 3.5rem;
+    width: 3.5rem;
+    height: 3.5rem;
+    color: #26c6da;
+  }
+
+  .brand-name {
+    font-size: 3rem;
+    font-weight: 700;
+    margin: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #80deea 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}
+
+.tagline {
+  font-size: 1.25rem;
+  color: rgba(255, 255, 255, 0.8);
+  margin: 0 0 3rem;
+}
+
+.features {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+
+  .feature {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+
+    mat-icon {
+      color: #26c6da;
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    span {
+      font-size: 1rem;
+    }
+  }
+}
+
+// Right side - Form panel
+.auth-form-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--mat-sys-surface);
   padding: 2rem;
-  border-radius: 1.5rem;
-  box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.12);
+}
 
-  mat-card-header {
-    padding-bottom: 1.5rem;
-    margin-bottom: 0;
+.form-wrapper {
+  width: 100%;
+  max-width: 25rem;
+}
 
-    .header-content {
-      text-align: center;
-      width: 100%;
+.form-header {
+  text-align: center;
+  margin-bottom: 2rem;
 
-      h1 {
-        font: var(--mat-sys-display-medium);
-        color: var(--mat-sys-primary);
-        margin: 0 0 0.5rem;
-        font-weight: 700;
-      }
+  .form-logo {
+    font-size: 3rem;
+    width: 3rem;
+    height: 3rem;
+    color: var(--mat-sys-primary);
+    margin-bottom: 1rem;
+  }
 
-      .subtitle {
-        font: var(--mat-sys-body-large);
-        color: var(--mat-sys-on-surface-variant);
-        margin: 0;
-      }
+  h2 {
+    font: var(--mat-sys-headline-large);
+    color: var(--mat-sys-on-surface);
+    margin: 0 0 0.5rem;
+    font-weight: 600;
+  }
+
+  .form-subtitle {
+    font: var(--mat-sys-body-large);
+    color: var(--mat-sys-on-surface-variant);
+    margin: 0;
+  }
+}
+
+.form-footer {
+  text-align: center;
+  margin-top: 1.5rem;
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+
+  .switch-link {
+    color: var(--mat-sys-primary);
+    cursor: pointer;
+    margin-left: 0.25rem;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.copyright {
+  text-align: center;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+// Responsive - Stack on mobile
+@media (max-width: 64rem) {
+  .auth-container {
+    flex-direction: column;
+  }
+
+  .auth-branding {
+    padding: 2rem;
+    min-height: auto;
+  }
+
+  .branding-content {
+    text-align: center;
+  }
+
+  .logo-section {
+    justify-content: center;
+
+    .logo-icon {
+      font-size: 2.5rem;
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+
+    .brand-name {
+      font-size: 2rem;
     }
   }
 
-  mat-card-content {
-    padding: 0;
+  .tagline {
+    margin-bottom: 1.5rem;
+  }
+
+  .features {
+    display: none;
+  }
+
+  .auth-form-container {
+    padding: 2rem 1.5rem;
   }
 }
 
 @media (max-width: 37.5rem) {
-  .auth-container {
-    padding: 1rem;
+  .auth-branding {
+    padding: 1.5rem;
   }
 
-  .auth-card {
-    padding: 1.5rem;
-
-    mat-card-header .header-content h1 {
-      font: var(--mat-sys-display-small);
-    }
+  .form-wrapper {
+    max-width: 100%;
   }
 }
