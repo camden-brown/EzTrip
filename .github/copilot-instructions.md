@@ -189,6 +189,17 @@ Multi-stage Dockerfile builds optimized binary from source. The `seed-init` serv
 - **UUID primary keys** - use `type:uuid;default:gen_random_uuid()`
 - **Soft deletes** - include `DeletedAt gorm.DeletedAt` in models
 
+## Frontend (Web App) Guidelines
+
+### CSS/SCSS Conventions
+
+- **Use relative units** - prefer `rem`, `em`, `%`, `vh`, `vw` over `px`
+  - `rem` for font sizes, spacing, and most dimensions
+  - `em` for component-relative sizing
+  - `%` or viewport units for responsive layouts
+- **Use SCSS variables** - import from `styles/_variables.scss` for colors
+- Base font size is 16px, so `1rem = 16px`
+
 ## GraphQL Playground
 
 Access at: http://localhost:8080/graphql

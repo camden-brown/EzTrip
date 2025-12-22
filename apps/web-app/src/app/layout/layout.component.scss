@@ -1,0 +1,55 @@
+@use '../../styles/variables' as *;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.sidenav-container {
+  flex: 1;
+  margin-top: 4rem;
+  background: $bg-primary;
+}
+
+.sidenav {
+  width: 18rem;
+  background: transparent;
+  border: none;
+  transition: width 0.3s ease;
+  padding: 1rem 0 1rem 1rem;
+
+  &.collapsed {
+    width: 4.5rem;
+  }
+}
+
+// Floating card style for sidenav content
+::ng-deep .mat-drawer-inner-container {
+  background: $bg-secondary;
+  border-radius: 0.75rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.main-content {
+  background: $bg-primary;
+  transition: margin-left 0.3s ease;
+}
+
+.content-wrapper {
+  padding: 1.5rem;
+  max-width: 100rem;
+  margin: 0 auto;
+
+  @media (max-width: 37.5rem) {
+    padding: 1rem;
+  }
+}

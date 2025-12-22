@@ -1,0 +1,36 @@
+<nav class="side-nav" [class.collapsed]="collapsed">
+  <div class="menu-container">
+    @for (section of navSections; track section.label) {
+      <div class="menu-section">
+        @if (!collapsed) {
+          <div class="section-label">{{ section.label }}</div>
+        }
+        <ul class="menu-list">
+          @for (item of section.items; track item.route) {
+            <li>
+              <a
+                [routerLink]="item.route"
+                routerLinkActive="active-route"
+                [routerLinkActiveOptions]="{
+                  exact: item.route === '/dashboard',
+                }"
+                (click)="onNavItemClick()"
+                [matTooltip]="collapsed ? item.label : ''"
+                matTooltipPosition="right"
+                class="menu-item"
+              >
+                <mat-icon class="menu-icon">{{ item.icon }}</mat-icon>
+                @if (!collapsed) {
+                  <span class="menu-text">{{ item.label }}</span>
+                }
+                @if (item.badge && !collapsed) {
+                  <span class="menu-badge">{{ item.badge }}</span>
+                }
+              </a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </div>
+</nav>

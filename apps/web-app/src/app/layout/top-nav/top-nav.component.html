@@ -1,0 +1,106 @@
+<mat-toolbar class="top-nav">
+  <div class="nav-left">
+    <button
+      mat-icon-button
+      class="menu-toggle"
+      (click)="onMenuToggle()"
+      aria-label="Toggle navigation menu"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+
+    <a routerLink="/dashboard" class="logo">
+      <span class="logo-icon">✈</span>
+      <span class="logo-text" [class.hidden]="isMobile">EzTrip</span>
+    </a>
+  </div>
+
+  <div class="nav-right">
+    <!-- Notifications -->
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="notificationsMenu"
+      aria-label="Notifications"
+      class="nav-icon-btn"
+    >
+      <mat-icon
+        [matBadge]="notificationCount"
+        matBadgeColor="warn"
+        matBadgeSize="small"
+        [matBadgeHidden]="notificationCount === 0"
+      >
+        notifications
+      </mat-icon>
+    </button>
+
+    <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
+      <div class="menu-header">
+        <span>Notifications</span>
+        <span class="badge">{{ notificationCount }} new</span>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item>
+        <mat-icon>flight</mat-icon>
+        <span>Your flight to Paris is confirmed</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>hotel</mat-icon>
+        <span>Hotel booking reminder</span>
+      </button>
+      <button mat-menu-item>
+        <mat-icon>local_offer</mat-icon>
+        <span>New deals available!</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item class="view-all">
+        <span>View all notifications</span>
+      </button>
+    </mat-menu>
+
+    <!-- User Profile -->
+    <button
+      mat-icon-button
+      [matMenuTriggerFor]="userMenu"
+      class="user-menu-trigger"
+      aria-label="User menu"
+    >
+      <div class="user-avatar">
+        @if (user.avatar) {
+          <img [src]="user.avatar" [alt]="user.name" />
+        } @else {
+          <mat-icon>person</mat-icon>
+        }
+      </div>
+    </button>
+
+    <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
+      <div class="user-info" mat-menu-item disabled>
+        <div class="user-avatar large">
+          @if (user.avatar) {
+            <img [src]="user.avatar" [alt]="user.name" />
+          } @else {
+            <mat-icon>person</mat-icon>
+          }
+        </div>
+        <div class="user-details">
+          <span class="name">{{ user.name }}</span>
+          <span class="email">{{ user.email }}</span>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item routerLink="/dashboard/profile">
+        <mat-icon>person_outline</mat-icon>
+        <span>My Profile</span>
+      </button>
+      <button mat-menu-item routerLink="/dashboard/settings">
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="onLogout()" class="logout-btn">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </div>
+</mat-toolbar>

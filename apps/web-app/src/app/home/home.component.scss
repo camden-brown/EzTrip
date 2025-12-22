@@ -1,0 +1,15 @@
+@use '../../styles/variables' as *;
+
+.dashboard {
+  h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  p {
+    margin: 0;
+    color: $text-disabled;
+  }
+}

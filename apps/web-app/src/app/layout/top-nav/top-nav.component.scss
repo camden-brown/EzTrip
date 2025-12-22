@@ -1,0 +1,177 @@
+@use '../../../styles/variables' as *;
+
+.top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: 4rem;
+  background: $bg-primary;
+  border-bottom: 0.0625rem solid $border-light;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+
+  @media (max-width: 37.5rem) {
+    padding: 0 0.5rem;
+  }
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menu-toggle {
+  color: $text-secondary;
+
+  &:hover {
+    background: $bg-hover;
+  }
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: $text-white;
+  font-weight: 500;
+  font-size: 1.25rem;
+
+  .logo-icon {
+    font-size: 1.5rem;
+  }
+
+  .logo-text {
+    transition: opacity 0.2s ease;
+
+    &.hidden {
+      display: none;
+    }
+  }
+}
+
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-icon-btn {
+  color: $text-secondary;
+
+  &:hover {
+    background: $bg-hover;
+  }
+
+  mat-icon {
+    color: $text-secondary;
+  }
+}
+
+.user-menu-trigger {
+  color: $text-secondary;
+
+  &:hover {
+    background: $bg-hover;
+  }
+}
+
+.user-avatar {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: $gradient-accent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  mat-icon {
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    color: $text-white;
+  }
+
+  &.large {
+    width: 2.5rem;
+    height: 2.5rem;
+
+    mat-icon {
+      font-size: 1.5rem;
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+}
+
+// Menu styles (applied globally via ::ng-deep)
+::ng-deep {
+  .notifications-menu,
+  .user-menu {
+    min-width: 17.5rem;
+
+    .menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      font-weight: 500;
+
+      .badge {
+        font-size: 0.75rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: 0.75rem;
+        background: $color-error;
+        color: $text-white;
+      }
+    }
+
+    .view-all {
+      justify-content: center;
+      color: $color-primary-lighter;
+    }
+  }
+
+  .user-menu {
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      height: auto;
+      opacity: 1 !important;
+      cursor: default;
+
+      .user-details {
+        display: flex;
+        flex-direction: column;
+
+        .name {
+          font-weight: 500;
+          color: $text-primary;
+        }
+
+        .email {
+          font-size: 0.875rem;
+          color: $text-disabled;
+        }
+      }
+    }
+
+    .logout-btn {
+      color: $color-error;
+    }
+  }
+}
