@@ -1,9 +1,9 @@
 package main
 
 import (
-	"travel-app/api-go/db"
-	"travel-app/api-go/logger"
-	"travel-app/api-go/seeds"
+	"eztrip/api-go/db"
+	"eztrip/api-go/logger"
+	"eztrip/api-go/seeds"
 )
 
 func main() {

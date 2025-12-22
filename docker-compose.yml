@@ -1,11 +1,11 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: travel-app-db
+    container_name: eztrip-db
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: travel_app
+      POSTGRES_DB: eztrip
     ports:
       - "5432:5432"
     volumes:
@@ -16,13 +16,13 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - travel-app-network
+      - eztrip-network
 
   seed-init:
     build:
       context: ./apps/api-go
       dockerfile: Dockerfile.dev
-    container_name: travel-app-seed-init
+    container_name: eztrip-seed-init
     volumes:
       - ./apps/api-go:/app
     environment:
@@ -30,12 +30,12 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
-      DB_NAME: travel_app
+      DB_NAME: eztrip
     depends_on:
       postgres:
         condition: service_healthy
     networks:
-      - travel-app-network
+      - eztrip-network
     command: go run cmd/seed/main.go
     restart: "no" # Run once and exit
 
@@ -43,7 +43,7 @@ services:
     build:
       context: ./apps/api-go
       dockerfile: Dockerfile.dev
-    container_name: travel-app-api
+    container_name: eztrip-api
     volumes:
       - ./apps/api-go:/app
       - /app/tmp # Exclude tmp directory from sync
@@ -52,7 +52,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
-      DB_NAME: travel_app
+      DB_NAME: eztrip
       GIN_MODE: debug # debug mode for local development
       # CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:4200"  # Comma-separated list
     ports:
@@ -63,12 +63,12 @@ services:
       seed-init:
         condition: service_completed_successfully
     networks:
-      - travel-app-network
+      - eztrip-network
     command: air -c .air.toml
 
 volumes:
   postgres_data:
 
 networks:
-  travel-app-network:
+  eztrip-network:
     driver: bridge

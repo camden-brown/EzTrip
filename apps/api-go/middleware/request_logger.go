@@ -3,7 +3,7 @@ package middleware
 import (
 	"time"
 
-	"travel-app/api-go/logger"
+	"eztrip/api-go/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"

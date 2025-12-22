@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"travel-app/api-go/logger"
+	"eztrip/api-go/logger"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"

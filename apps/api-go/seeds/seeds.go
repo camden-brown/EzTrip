@@ -1,7 +1,7 @@
 package seeds
 
 import (
-	"travel-app/api-go/logger"
+	"eztrip/api-go/logger"
 
 	"gorm.io/gorm"
 )

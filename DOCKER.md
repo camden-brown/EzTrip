@@ -40,19 +40,19 @@ docker-compose up -d
 
 ```bash
 # Access PostgreSQL CLI
-docker exec -it travel-app-db psql -U postgres -d travel_app
+docker exec -it eztrip-db psql -U postgres -d eztrip
 
 # Run migrations manually
-docker exec -i travel-app-db psql -U postgres -d travel_app < packages/api-go/migrations/001_create_users.sql
+docker exec -i eztrip-db psql -U postgres -d eztrip < packages/api-go/migrations/001_create_users.sql
 
 # Run seeds
-docker exec -i travel-app-db psql -U postgres -d travel_app < packages/api-go/seeds/users.sql
+docker exec -i eztrip-db psql -U postgres -d eztrip < packages/api-go/seeds/users.sql
 
 # Backup database
-docker exec travel-app-db pg_dump -U postgres travel_app > backup.sql
+docker exec eztrip-db pg_dump -U postgres eztrip > backup.sql
 
 # Restore database
-docker exec -i travel-app-db psql -U postgres -d travel_app < backup.sql
+docker exec -i eztrip-db psql -U postgres -d eztrip < backup.sql
 ```
 
 ### Logs
@@ -82,7 +82,7 @@ docker-compose up --build
 docker-compose ps
 
 # Access API container shell
-docker exec -it travel-app-api sh
+docker exec -it eztrip-api sh
 
 # Check API health
 curl http://localhost:8080/health

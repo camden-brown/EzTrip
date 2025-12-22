@@ -1,8 +1,8 @@
 package migrations
 
 import (
-	"travel-app/api-go/logger"
-	"travel-app/api-go/user"
+	"eztrip/api-go/logger"
+	"eztrip/api-go/user"
 
 	"gorm.io/gorm"
 )

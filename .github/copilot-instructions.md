@@ -78,7 +78,7 @@ type User struct {
 ```yaml
 models:
   User:
-    model: travel-app/api-go/user.User
+    model: eztrip/api-go/user.User
 ```
 
 - Run `npx nx run api-go:generate` after schema changes
@@ -130,7 +130,7 @@ Follow this pattern when adding a new model (e.g., Post):
 
 4. **Configure gqlgen**: `packages/api-go/gqlgen.yml`
 
-   - Map GraphQL type to Go model: `Post: { model: travel-app/api-go/post.Post }`
+   - Map GraphQL type to Go model: `Post: { model: eztrip/api-go/post.Post }`
 
 5. **Generate and implement**:
 
@@ -153,7 +153,7 @@ Development (docker-compose.yml):
 - `DB_PORT=5432`
 - `DB_USER=postgres`
 - `DB_PASSWORD=postgres`
-- `DB_NAME=travel_app`
+- `DB_NAME=eztrip`
 - `GIN_MODE=debug` (development mode)
 
 Production: Use `GIN_MODE=release`

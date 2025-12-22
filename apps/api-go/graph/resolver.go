@@ -1,7 +1,7 @@
 package graph
 
 import (
-	"travel-app/api-go/user"
+	"eztrip/api-go/user"
 
 	"gorm.io/gorm"
 )

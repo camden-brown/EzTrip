@@ -1,8 +1,8 @@
 package seeds
 
 import (
-	"travel-app/api-go/logger"
-	"travel-app/api-go/user"
+	"eztrip/api-go/logger"
+	"eztrip/api-go/user"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"

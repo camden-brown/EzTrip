@@ -121,7 +121,7 @@ call_argument_directives_with_null: true
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
 autobind:
-#  - "travel-app/api-go/graph/model"
+#  - "eztrip/api-go/graph/model"
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -135,7 +135,7 @@ models:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
       - github.com/99designs/gqlgen/graphql.Int32
-  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid 
+  # gqlgen provides a default GraphQL UUID convenience wrapper for github.com/google/uuid
   # but you can override this to provide your own GraphQL UUID implementation
   UUID:
     model:
@@ -157,8 +157,8 @@ models:
     model:
       - github.com/99designs/gqlgen/graphql.Int
       - github.com/99designs/gqlgen/graphql.Int64
-  
+
   # Use custom domain model for User
   User:
     model:
-      - travel-app/api-go/user.User
+      - eztrip/api-go/user.User

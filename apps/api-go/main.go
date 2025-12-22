@@ -5,11 +5,11 @@ import (
 	"os"
 	"strings"
 
-	"travel-app/api-go/db"
-	"travel-app/api-go/graph"
-	"travel-app/api-go/logger"
-	"travel-app/api-go/middleware"
-	"travel-app/api-go/migrations"
+	"eztrip/api-go/db"
+	"eztrip/api-go/graph"
+	"eztrip/api-go/logger"
+	"eztrip/api-go/middleware"
+	"eztrip/api-go/migrations"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"

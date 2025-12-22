@@ -7,7 +7,7 @@ package graph
 
 import (
 	"context"
-	"travel-app/api-go/user"
+	"eztrip/api-go/user"
 )
 
 // Hello is the resolver for the hello field.

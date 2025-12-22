@@ -7,11 +7,11 @@ import (
 	"context"
 	"embed"
 	"errors"
+	"eztrip/api-go/user"
 	"fmt"
 	"strconv"
 	"sync"
 	"sync/atomic"
-	"travel-app/api-go/user"
 
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
