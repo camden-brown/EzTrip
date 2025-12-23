@@ -1,0 +1,67 @@
+<div class="notification-container" (click)="$event.stopPropagation()">
+  <div class="menu-header">
+    <span class="title">Notifications</span>
+    <a class="mark-read" (click)="markAllAsRead()">Mark all as read</a>
+  </div>
+
+  <div class="notification-tabs">
+    <button
+      class="tab"
+      [class.active]="activeTab === 'inbox'"
+      (click)="setActiveTab('inbox')"
+    >
+      Inbox
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'general'"
+      (click)="setActiveTab('general')"
+    >
+      General
+    </button>
+    <button
+      class="tab"
+      [class.active]="activeTab === 'archived'"
+      (click)="setActiveTab('archived')"
+    >
+      Archived
+    </button>
+  </div>
+
+  <div class="search-box">
+    <mat-icon>search</mat-icon>
+    <input
+      type="text"
+      placeholder="Search"
+      [(ngModel)]="searchQuery"
+      (click)="$event.stopPropagation()"
+    />
+  </div>
+
+  <div class="notification-list">
+    @for (notification of notifications; track notification.id) {
+      <div
+        class="notification-item"
+        [class.unread]="notification.isUnread"
+        (click)="handleNotificationClick(notification)"
+      >
+        <div class="notification-avatar">
+          <img [src]="notification.avatar" [alt]="notification.name" />
+          @if (notification.isUnread) {
+            <span class="unread-dot"></span>
+          }
+        </div>
+        <div class="notification-content">
+          <div class="notification-header">
+            <span class="name">{{ notification.name }}</span>
+            <span class="time">{{ notification.time }}</span>
+            @if (notification.hasOnlineStatus) {
+              <span class="status-dot"></span>
+            }
+          </div>
+          <p class="message">{{ notification.message }}</p>
+        </div>
+      </div>
+    }
+  </div>
+</div>

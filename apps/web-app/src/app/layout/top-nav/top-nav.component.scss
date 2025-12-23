@@ -75,6 +75,10 @@
 
 .user-menu-trigger {
   color: $text-secondary;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background: $bg-hover;
@@ -91,87 +95,55 @@
   justify-content: center;
   overflow: hidden;
 
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
   mat-icon {
     font-size: 1.25rem;
     width: 1.25rem;
     height: 1.25rem;
     color: $text-white;
   }
-
-  &.large {
-    width: 2.5rem;
-    height: 2.5rem;
-
-    mat-icon {
-      font-size: 1.5rem;
-      width: 1.5rem;
-      height: 1.5rem;
-    }
-  }
 }
 
 // Menu styles (applied globally via ::ng-deep)
 ::ng-deep {
-  .notifications-menu,
-  .user-menu {
-    min-width: 17.5rem;
+  .notifications-menu {
+    min-width: 26rem;
+    max-width: 26rem;
+    max-height: 80vh;
+    overflow: hidden;
 
-    .menu-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.75rem 1rem;
-      font-weight: 500;
-
-      .badge {
-        font-size: 0.75rem;
-        padding: 0.125rem 0.5rem;
-        border-radius: 0.75rem;
-        background: $color-error;
-        color: $text-white;
-      }
-    }
-
-    .view-all {
-      justify-content: center;
-      color: $color-primary-lighter;
+    .mat-mdc-menu-content {
+      padding: 0;
     }
   }
 
   .user-menu {
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
+    min-width: 12.5rem;
+
+    button[mat-menu-item] {
+      padding: 0.625rem 1rem;
       height: auto;
-      opacity: 1 !important;
-      cursor: default;
+      line-height: 1.5;
 
-      .user-details {
-        display: flex;
-        flex-direction: column;
+      mat-icon {
+        margin-right: 0.75rem;
+        color: $text-secondary;
+      }
 
-        .name {
-          font-weight: 500;
-          color: $text-primary;
-        }
+      span {
+        color: $text-primary;
+        font-size: 0.875rem;
+      }
 
-        .email {
-          font-size: 0.875rem;
-          color: $text-disabled;
-        }
+      &:hover {
+        background-color: $bg-hover;
       }
     }
 
     .logout-btn {
-      color: $color-error;
+      mat-icon,
+      span {
+        color: $text-secondary;
+      }
     }
   }
 }

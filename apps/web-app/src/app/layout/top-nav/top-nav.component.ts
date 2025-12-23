@@ -7,6 +7,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
+import { NotificationsComponent } from './notifications/notifications.component';
 
 @Component({
   selector: 'eztrip-top-nav',
@@ -20,6 +21,7 @@ import { RouterModule } from '@angular/router';
     MatBadgeModule,
     MatDividerModule,
     RouterModule,
+    NotificationsComponent,
   ],
   templateUrl: './top-nav.component.html',
   styleUrl: './top-nav.component.scss',
@@ -27,13 +29,6 @@ import { RouterModule } from '@angular/router';
 export class TopNavComponent {
   @Input() isMobile = false;
   @Output() menuToggle = new EventEmitter<void>();
-
-  // Mock user data - replace with actual auth service
-  user = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    avatar: null as string | null,
-  };
 
   notificationCount = 3;
 
