@@ -10,9 +10,9 @@ import (
 	"eztrip/api-go/user"
 )
 
-// Hello is the resolver for the hello field.
-func (r *queryResolver) Hello(ctx context.Context) (string, error) {
-	return "Hello from GraphQL!", nil
+// CurrentUser is the resolver for the currentUser field.
+func (r *queryResolver) CurrentUser(ctx context.Context) (*user.User, error) {
+	return r.UserService.GetCurrent(ctx)
 }
 
 // Users is the resolver for the users field.

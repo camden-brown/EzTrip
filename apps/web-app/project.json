@@ -33,6 +33,12 @@
       },
       "configurations": {
         "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/web-app/src/environments/environment.ts",
+              "with": "apps/web-app/src/environments/environment.production.ts"
+            }
+          ],
           "budgets": [
             {
               "type": "initial",
@@ -48,6 +54,12 @@
           "outputHashing": "all"
         },
         "development": {
+          "fileReplacements": [
+            {
+              "replace": "apps/web-app/src/environments/environment.ts",
+              "with": "apps/web-app/src/environments/environment.development.ts"
+            }
+          ],
           "optimization": false,
           "extractLicenses": false,
           "sourceMap": true

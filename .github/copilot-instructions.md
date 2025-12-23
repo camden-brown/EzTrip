@@ -191,6 +191,15 @@ Multi-stage Dockerfile builds optimized binary from source. The `seed-init` serv
 
 ## Frontend (Web App) Guidelines
 
+### Angular Component Conventions
+
+- **Use OnPush change detection** - always add `changeDetection: ChangeDetectionStrategy.OnPush` for child components
+  - Import: `import { ChangeDetectionStrategy } from '@angular/core';`
+  - Improves performance by reducing change detection cycles
+  - Required for all presentational/child components
+- **Standalone components** - use standalone: true for all new components
+- **Smart/Dumb pattern** - separate container (smart) from presentational (dumb) components
+
 ### CSS/SCSS Conventions
 
 - **Use relative units** - prefer `rem`, `em`, `%`, `vh`, `vw` over `px`

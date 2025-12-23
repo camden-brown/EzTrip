@@ -113,37 +113,23 @@
 
     .mat-mdc-menu-content {
       padding: 0;
+      background: $bg-primary;
+    }
+
+    .mat-mdc-menu-panel {
+      background: $bg-primary;
     }
   }
 
   .user-menu {
     min-width: 12.5rem;
 
-    button[mat-menu-item] {
-      padding: 0.625rem 1rem;
-      height: auto;
-      line-height: 1.5;
-
-      mat-icon {
-        margin-right: 0.75rem;
-        color: $text-secondary;
-      }
-
-      span {
-        color: $text-primary;
-        font-size: 0.875rem;
-      }
-
-      &:hover {
-        background-color: $bg-hover;
-      }
+    .mat-mdc-menu-content {
+      background: $bg-primary;
     }
 
-    .logout-btn {
-      mat-icon,
-      span {
-        color: $text-secondary;
-      }
+    .mat-mdc-menu-panel {
+      background: $bg-primary;
     }
   }
 }

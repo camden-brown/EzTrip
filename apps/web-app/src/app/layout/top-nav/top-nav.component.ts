@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,6 +14,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
 import { NotificationsComponent } from './notifications/notifications.component';
+import { ProfileMenuComponent } from './profile-menu/profile-menu.component';
 
 @Component({
   selector: 'eztrip-top-nav',
@@ -22,9 +29,11 @@ import { NotificationsComponent } from './notifications/notifications.component'
     MatDividerModule,
     RouterModule,
     NotificationsComponent,
+    ProfileMenuComponent,
   ],
   templateUrl: './top-nav.component.html',
   styleUrl: './top-nav.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopNavComponent {
   @Input() isMobile = false;

@@ -47,9 +47,9 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Query struct {
-		Hello func(childComplexity int) int
-		User  func(childComplexity int, id string) int
-		Users func(childComplexity int) int
+		CurrentUser func(childComplexity int) int
+		User        func(childComplexity int, id string) int
+		Users       func(childComplexity int) int
 	}
 
 	User struct {
@@ -61,7 +61,7 @@ type ComplexityRoot struct {
 }
 
 type QueryResolver interface {
-	Hello(ctx context.Context) (string, error)
+	CurrentUser(ctx context.Context) (*user.User, error)
 	Users(ctx context.Context) ([]*user.User, error)
 	User(ctx context.Context, id string) (*user.User, error)
 }
@@ -85,12 +85,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
-	case "Query.hello":
-		if e.complexity.Query.Hello == nil {
+	case "Query.currentUser":
+		if e.complexity.Query.CurrentUser == nil {
 			break
 		}
 
-		return e.complexity.Query.Hello(childComplexity), true
+		return e.complexity.Query.CurrentUser(childComplexity), true
 	case "Query.user":
 		if e.complexity.Query.User == nil {
 			break
@@ -316,30 +316,40 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 
 // region    **************************** field.gotpl *****************************
 
-func (ec *executionContext) _Query_hello(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+func (ec *executionContext) _Query_currentUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
 		ec.OperationContext,
 		field,
-		ec.fieldContext_Query_hello,
+		ec.fieldContext_Query_currentUser,
 		func(ctx context.Context) (any, error) {
-			return ec.resolvers.Query().Hello(ctx)
+			return ec.resolvers.Query().CurrentUser(ctx)
 		},
 		nil,
-		ec.marshalNString2string,
+		ec.marshalOUser2ᚖeztripᚋapiᚑgoᚋuserᚐUser,
 		true,
-		true,
+		false,
 	)
 }
 
-func (ec *executionContext) fieldContext_Query_hello(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Query_currentUser(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Query",
 		Field:      field,
 		IsMethod:   true,
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_User_id(ctx, field)
+			case "firstName":
+				return ec.fieldContext_User_firstName(ctx, field)
+			case "lastName":
+				return ec.fieldContext_User_lastName(ctx, field)
+			case "email":
+				return ec.fieldContext_User_email(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 		},
 	}
 	return fc, nil
@@ -355,7 +365,7 @@ func (ec *executionContext) _Query_users(ctx context.Context, field graphql.Coll
 			return ec.resolvers.Query().Users(ctx)
 		},
 		nil,
-		ec.marshalNUser2ᚕᚖtravelᚑappᚋapiᚑgoᚋuserᚐUserᚄ,
+		ec.marshalNUser2ᚕᚖeztripᚋapiᚑgoᚋuserᚐUserᚄ,
 		true,
 		true,
 	)
@@ -395,7 +405,7 @@ func (ec *executionContext) _Query_user(ctx context.Context, field graphql.Colle
 			return ec.resolvers.Query().User(ctx, fc.Args["id"].(string))
 		},
 		nil,
-		ec.marshalOUser2ᚖtravelᚑappᚋapiᚑgoᚋuserᚐUser,
+		ec.marshalOUser2ᚖeztripᚋapiᚑgoᚋuserᚐUser,
 		true,
 		false,
 	)
@@ -2132,19 +2142,16 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 		switch field.Name {
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("Query")
-		case "hello":
+		case "currentUser":
 			field := field
 
-			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
 				defer func() {
 					if r := recover(); r != nil {
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Query_hello(ctx, field)
-				if res == graphql.Null {
-					atomic.AddUint32(&fs.Invalids, 1)
-				}
+				res = ec._Query_currentUser(ctx, field)
 				return res
 			}
 
@@ -2663,7 +2670,7 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 	return res
 }
 
-func (ec *executionContext) marshalNUser2ᚕᚖtravelᚑappᚋapiᚑgoᚋuserᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*user.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚕᚖeztripᚋapiᚑgoᚋuserᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*user.User) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -2687,7 +2694,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖtravelᚑappᚋapiᚑgoᚋuserᚐ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNUser2ᚖtravelᚑappᚋapiᚑgoᚋuserᚐUser(ctx, sel, v[i])
+			ret[i] = ec.marshalNUser2ᚖeztripᚋapiᚑgoᚋuserᚐUser(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -2707,7 +2714,7 @@ func (ec *executionContext) marshalNUser2ᚕᚖtravelᚑappᚋapiᚑgoᚋuserᚐ
 	return ret
 }
 
-func (ec *executionContext) marshalNUser2ᚖtravelᚑappᚋapiᚑgoᚋuserᚐUser(ctx context.Context, sel ast.SelectionSet, v *user.User) graphql.Marshaler {
+func (ec *executionContext) marshalNUser2ᚖeztripᚋapiᚑgoᚋuserᚐUser(ctx context.Context, sel ast.SelectionSet, v *user.User) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
@@ -3018,7 +3025,7 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	return res
 }
 
-func (ec *executionContext) marshalOUser2ᚖtravelᚑappᚋapiᚑgoᚋuserᚐUser(ctx context.Context, sel ast.SelectionSet, v *user.User) graphql.Marshaler {
+func (ec *executionContext) marshalOUser2ᚖeztripᚋapiᚑgoᚋuserᚐUser(ctx context.Context, sel ast.SelectionSet, v *user.User) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

@@ -48,18 +48,7 @@
     </button>
 
     <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
-      <button mat-menu-item routerLink="/dashboard/profile">
-        <mat-icon>person_outline</mat-icon>
-        <span>Profile</span>
-      </button>
-      <button mat-menu-item routerLink="/dashboard/settings">
-        <mat-icon>settings_outlined</mat-icon>
-        <span>Settings</span>
-      </button>
-      <button mat-menu-item (click)="onLogout()" class="logout-btn">
-        <mat-icon>logout</mat-icon>
-        <span>Log out</span>
-      </button>
+      <eztrip-profile-menu (logout)="onLogout()" />
     </mat-menu>
   </div>
 </mat-toolbar>

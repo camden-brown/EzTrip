@@ -8,7 +8,9 @@ type User {
 }
 
 type Query {
-  hello: String!
+  # Returns the currently authenticated user.
+  # For now this is a placeholder until JWT auth is implemented.
+  currentUser: User
   users: [User!]!
   user(id: ID!): User
 }

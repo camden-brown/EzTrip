@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
@@ -24,6 +24,7 @@ export interface Notification {
   imports: [CommonModule, MatMenuModule, MatIconModule, FormsModule],
   templateUrl: './notifications.component.html',
   styleUrl: './notifications.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class NotificationsComponent {
   @Input() notificationCount = 0;

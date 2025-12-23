@@ -58,22 +58,6 @@ cd packages/api-go
 go run github.com/99designs/gqlgen generate
 ```
 
-### Current Schema
-
-```graphql
-type Query {
-  hello: String!
-}
-```
-
-### Example Query
-
-```graphql
-query {
-  hello
-}
-```
-
 ## Using GraphQL Playground
 
 1. Open your browser to `http://localhost:8080/graphql`

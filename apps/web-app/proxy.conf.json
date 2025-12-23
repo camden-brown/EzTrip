@@ -1,6 +1,11 @@
 {
   "/api-go": {
-    "target": "http://localhost:3333",
-    "secure": false
+    "target": "http://localhost:8080",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn",
+    "pathRewrite": {
+      "^/api-go": ""
+    }
   }
 }

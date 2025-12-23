@@ -49,6 +49,23 @@ func (s *Service) GetByID(ctx context.Context, id string) (*User, error) {
 	return &user, nil
 }
 
+// GetCurrent returns the current authenticated user.
+//
+// Placeholder implementation: returns the most recently created user.
+// This will be replaced with JWT-based lookup once authentication is added.
+func (s *Service) GetCurrent(ctx context.Context) (*User, error) {
+	var current User
+	result := s.db.WithContext(ctx).Order("created_at DESC").Limit(1).First(&current)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		logger.Log.WithError(result.Error).Error("Failed to fetch current user")
+		return nil, result.Error
+	}
+	return &current, nil
+}
+
 func (s *Service) Create(ctx context.Context, input CreateUserInput) (*User, error) {
 	user := User{
 		FirstName: input.FirstName,

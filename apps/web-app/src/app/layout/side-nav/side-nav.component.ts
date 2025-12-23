@@ -1,4 +1,10 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,6 +28,7 @@ export interface NavSection {
   imports: [CommonModule, RouterModule, MatIconModule, MatTooltipModule],
   templateUrl: './side-nav.component.html',
   styleUrl: './side-nav.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SideNavComponent {
   @Input() collapsed = false;
