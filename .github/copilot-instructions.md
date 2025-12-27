@@ -163,29 +163,23 @@ models:
 Follow this pattern when adding a new model (e.g., Post):
 
 1. **Create domain model**: `packages/api-go/post/post.go`
-
    - Add GORM tags, UUID primary key, timestamps, soft delete
 
 2. **Create service**: `packages/api-go/post/service.go`
-
    - Implement CRUD operations with GORM
 
 3. **Update GraphQL schema**: `packages/api-go/graph/schema.graphqls`
-
    - Define types, queries, mutations
 
 4. **Configure gqlgen**: `packages/api-go/gqlgen.yml`
-
    - Map GraphQL type to Go model: `Post: { model: eztrip/api-go/post.Post }`
 
 5. **Generate and implement**:
-
    - Run: `npx nx run api-go:generate`
    - Implement resolvers in `schema.resolvers.go`
    - Inject service in `resolver.go`
 
 6. **Add migration**: `packages/api-go/migrations/migrations.go`
-
    - Add to AutoMigrate: `db.AutoMigrate(&post.Post{})`
 
 7. **Create seeds**: `packages/api-go/seeds/post_seeds.go`
@@ -234,6 +228,7 @@ Multi-stage Dockerfile builds optimized binary from source. The `seed-init` serv
 - **Seeds run during Docker setup** - not on server startup (use `seed-init` service)
 - **UUID primary keys** - use `type:uuid;default:gen_random_uuid()`
 - **Soft deletes** - include `DeletedAt gorm.DeletedAt` in models
+- **NO SECRETS IN CODE** - This is a public GitHub repository. Never hardcode API keys, passwords, tokens, or any sensitive credentials. Always use environment variables and document them in `.env.example`
 
 ## Frontend (Web App) Guidelines
 
