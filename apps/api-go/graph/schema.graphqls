@@ -7,10 +7,21 @@ type User {
   email: String!
 }
 
+input CreateUserInput {
+  firstName: String!
+  lastName: String!
+  email: String!
+  password: String!
+}
+
 type Query {
   # Returns the currently authenticated user.
-  # For now this is a placeholder until JWT auth is implemented.
+  # Returns null when the request is unauthenticated.
   currentUser: User
   users: [User!]!
   user(id: ID!): User
+}
+
+type Mutation {
+  createUser(input: CreateUserInput!): User!
 }

@@ -47,14 +47,8 @@ services:
     volumes:
       - ./apps/api-go:/app
       - /app/tmp # Exclude tmp directory from sync
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_NAME: eztrip
-      GIN_MODE: debug # debug mode for local development
-      # CORS_ALLOWED_ORIGINS: "http://localhost:3000,http://localhost:4200"  # Comma-separated list
+    env_file:
+      - .env
     ports:
       - "8080:8080"
     depends_on:

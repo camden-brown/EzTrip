@@ -7,25 +7,36 @@ package graph
 
 import (
 	"context"
+	"eztrip/api-go/graph/model"
 	"eztrip/api-go/user"
+	"fmt"
 )
+
+// CreateUser is the resolver for the createUser field.
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*user.User, error) {
+	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
+}
 
 // CurrentUser is the resolver for the currentUser field.
 func (r *queryResolver) CurrentUser(ctx context.Context) (*user.User, error) {
-	return r.UserService.GetCurrent(ctx)
+	return r.UserResolver.CurrentUser(ctx)
 }
 
 // Users is the resolver for the users field.
 func (r *queryResolver) Users(ctx context.Context) ([]*user.User, error) {
-	return r.UserService.GetAll(ctx)
+	return r.UserResolver.Users(ctx)
 }
 
 // User is the resolver for the user field.
 func (r *queryResolver) User(ctx context.Context, id string) (*user.User, error) {
-	return r.UserService.GetByID(ctx, id)
+	return r.UserResolver.User(ctx, id)
 }
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

@@ -6,6 +6,7 @@ toolchain go1.24.11
 
 require (
 	github.com/99designs/gqlgen v0.17.85
+	github.com/auth0/go-jwt-middleware/v2 v2.3.1
 	github.com/gin-contrib/cors v1.7.6
 	github.com/gin-gonic/gin v1.11.0
 	github.com/sirupsen/logrus v1.9.3
@@ -59,4 +60,5 @@ require (
 	golang.org/x/text v0.32.0 // indirect
 	golang.org/x/tools v0.40.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
+	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 )

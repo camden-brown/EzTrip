@@ -78,15 +78,23 @@ func main() {
 	graphqlHandler := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 	playgroundHandler := playground.Handler("GraphQL Playground", "/graphql")
 
-	// GraphQL endpoint
-	router.POST("/graphql", func(c *gin.Context) {
+	auth0JWT, err := middleware.Auth0JWTFromEnv()
+	if err != nil {
+		logger.Log.Fatalf("Failed to configure Auth0 JWT middleware: %v", err)
+	}
+
+	// GraphQL endpoint (protected with Auth0 JWT)
+	router.POST("/graphql", auth0JWT, func(c *gin.Context) {
 		graphqlHandler.ServeHTTP(c.Writer, c.Request)
 	})
 
-	// GraphQL playground (development UI)
-	router.GET("/graphql", func(c *gin.Context) {
-		playgroundHandler.ServeHTTP(c.Writer, c.Request)
-	})
+	// GraphQL playground (development UI only)
+	if gin.Mode() != gin.ReleaseMode {
+		router.GET("/graphql", func(c *gin.Context) {
+			playgroundHandler.ServeHTTP(c.Writer, c.Request)
+		})
+		logger.Log.Info("GraphQL Playground enabled at /graphql")
+	}
 
 	logger.Log.Info("Starting server on :8080")
 	router.Run(":8080")

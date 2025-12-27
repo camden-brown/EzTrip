@@ -12,11 +12,14 @@ import (
 // here.
 
 type Resolver struct {
-	UserService *user.Service
+	UserService  *user.Service
+	UserResolver *user.Resolver
 }
 
 func NewResolver(db *gorm.DB) *Resolver {
+	userService := user.NewService(db)
 	return &Resolver{
-		UserService: user.NewService(db),
+		UserService:  userService,
+		UserResolver: user.NewResolver(userService),
 	}
 }

@@ -44,6 +44,52 @@ packages/api-go/
 
 ## Code Conventions
 
+### Clean Code Principles
+
+Always apply clean code principles to ensure maintainable, readable code:
+
+1. **Extract Magic Numbers & Strings to Constants**
+   - Define constants at package level for reusable values
+   - Use descriptive constant names: `defaultTimeout`, `maxRetries`, `pathUsers`
+
+2. **Never Ignore Errors**
+   - Always handle errors explicitly: `body, err := io.ReadAll(resp.Body)`
+   - Wrap errors with context: `fmt.Errorf("failed to read response: %w", err)`
+   - Never use blank identifier for errors: `_, _ := someFunc()` ❌
+
+3. **Single Responsibility Principle**
+   - Each function should do one thing well
+   - Extract complex logic into helper functions
+   - Keep functions short and focused (typically < 30 lines)
+
+4. **DRY (Don't Repeat Yourself)**
+   - Extract repeated code patterns into reusable functions
+   - Create helper functions for common operations
+   - Example: `makeAuthenticatedRequest()`, `buildURL()`, `readResponseBody()`
+
+5. **Meaningful Names**
+   - Use descriptive variable and function names
+   - Avoid abbreviations unless universally understood
+   - Functions should be verbs: `getAccessToken()`, `createUser()`
+   - Variables should be nouns: `connection`, `httpClient`
+
+6. **Small, Focused Functions**
+   - Extract validation logic
+   - Extract configuration retrieval
+   - Extract URL building and HTTP operations
+
+7. **Separation of Concerns**
+   - Keep business logic separate from presentation/API layers
+   - Services handle business logic and database operations
+   - Resolvers/controllers handle HTTP/GraphQL concerns
+   - Models define data structure only, no business logic
+   - Each package/module should have a single, well-defined purpose
+
+8. **Proper Error Context**
+   - Include relevant information in error messages
+   - Use structured logging with fields for context
+   - Wrap errors to preserve the error chain
+
 ### Domain Models
 
 - Use GORM tags for database mapping

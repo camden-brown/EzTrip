@@ -2,5 +2,15 @@
 
 package model
 
+type CreateUserInput struct {
+	FirstName string `json:"firstName"`
+	LastName  string `json:"lastName"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+}
+
+type Mutation struct {
+}
+
 type Query struct {
 }

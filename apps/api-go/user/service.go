@@ -3,7 +3,10 @@ package user
 import (
 	"context"
 	"fmt"
+	"strings"
 
+	"eztrip/api-go/auth0"
+	appErrors "eztrip/api-go/errors"
 	"eztrip/api-go/logger"
 
 	"github.com/sirupsen/logrus"
@@ -11,12 +14,20 @@ import (
 )
 
 type Service struct {
-	db *gorm.DB
+	db          *gorm.DB
+	auth0Client *auth0.Client
 }
 
 func NewService(db *gorm.DB) *Service {
+	auth0Client, err := auth0.NewClient()
+	if err != nil {
+		logger.Log.WithError(err).Error("Failed to initialize Auth0 client")
+		// Continue without Auth0 client - will fail on user creation attempts
+	}
+
 	return &Service{
-		db: db,
+		db:          db,
+		auth0Client: auth0Client,
 	}
 }
 
@@ -37,15 +48,32 @@ func (s *Service) GetByID(ctx context.Context, id string) (*User, error) {
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			logger.Log.WithField("id", id).Warn("User not found")
-			return nil, fmt.Errorf("user not found")
+			return nil, appErrors.NotFound("User")
 		}
 		logger.Log.WithFields(logrus.Fields{
 			"id":    id,
 			"error": result.Error,
 		}).Error("Failed to fetch user by ID")
-		return nil, result.Error
+		return nil, appErrors.Internal("Failed to fetch user")
 	}
 	logger.Log.WithField("id", id).Debug("Fetched user by ID")
+	return &user, nil
+}
+
+func (s *Service) GetByAuth0ID(ctx context.Context, auth0UserID string) (*User, error) {
+	var user User
+	result := s.db.WithContext(ctx).Where("auth0_user_id = ?", auth0UserID).First(&user)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, nil // Not found, return nil without error
+		}
+		logger.Log.WithFields(logrus.Fields{
+			"auth0_user_id": auth0UserID,
+			"error":         result.Error,
+		}).Error("Failed to fetch user by Auth0 ID")
+		return nil, result.Error
+	}
+	logger.Log.WithField("auth0_user_id", auth0UserID).Debug("Fetched user by Auth0 ID")
 	return &user, nil
 }
 
@@ -67,25 +95,125 @@ func (s *Service) GetCurrent(ctx context.Context) (*User, error) {
 }
 
 func (s *Service) Create(ctx context.Context, input CreateUserInput) (*User, error) {
+	if s.auth0Client == nil {
+		return nil, fmt.Errorf("auth0 client not initialized")
+	}
+
+	var createdUser *User
+
+	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// Step 1: Create user in database
+		user, err := s.createUserInDatabase(tx, input)
+		if err != nil {
+			return err
+		}
+
+		// Step 2: Create user in Auth0
+		auth0UserID, err := s.createUserInAuth0(input)
+		if err != nil {
+			return err
+		}
+
+		// Step 3: Link Auth0 user to database record
+		if err := s.linkAuth0User(tx, user, auth0UserID); err != nil {
+			s.cleanupAuth0User(auth0UserID)
+			return err
+		}
+
+		user.Auth0UserID = &auth0UserID
+		createdUser = user
+		return nil
+	})
+
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"email": input.Email,
+			"error": err,
+		}).Error("User creation transaction failed")
+		return nil, err
+	}
+
+	logger.Log.WithFields(logrus.Fields{
+		"id":            createdUser.ID,
+		"email":         createdUser.Email,
+		"auth0_user_id": *createdUser.Auth0UserID,
+	}).Info("User created successfully")
+
+	return createdUser, nil
+}
+
+// createUserInDatabase creates a user record in the database
+func (s *Service) createUserInDatabase(tx *gorm.DB, input CreateUserInput) (*User, error) {
 	user := User{
 		FirstName: input.FirstName,
 		LastName:  input.LastName,
 		Email:     input.Email,
 	}
 
-	result := s.db.WithContext(ctx).Create(&user)
-	if result.Error != nil {
+	if err := tx.Create(&user).Error; err != nil {
+		// Check if it's a unique constraint violation (duplicate email)
+		if strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "unique constraint") {
+			logger.Log.WithField("email", input.Email).Warn("Duplicate email attempted")
+			return nil, DuplicateEmailError()
+		}
+		
 		logger.Log.WithFields(logrus.Fields{
-			"email": user.Email,
-			"error": result.Error,
-		}).Error("Failed to create user")
-		return nil, result.Error
+			"email": input.Email,
+			"error": err,
+		}).Error("Failed to create user in database")
+		return nil, appErrors.Internal("Failed to create user")
 	}
+
 	logger.Log.WithFields(logrus.Fields{
 		"id":    user.ID,
 		"email": user.Email,
-	}).Info("User created successfully")
+	}).Debug("User created in database")
+
 	return &user, nil
+}
+
+// createUserInAuth0 creates a user in Auth0 and returns the Auth0 user ID
+func (s *Service) createUserInAuth0(input CreateUserInput) (string, error) {
+	auth0User, err := s.auth0Client.CreateUser(input.Email, input.Password, input.FirstName, input.LastName)
+	if err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"email": input.Email,
+			"error": err,
+		}).Error("Failed to create user in Auth0")
+		return "", appErrors.Internal("Failed to create user account")
+	}
+
+	logger.Log.WithField("auth0_user_id", auth0User.UserID).Debug("User created in Auth0")
+	return auth0User.UserID, nil
+}
+
+// linkAuth0User updates the database user record with the Auth0 user ID
+func (s *Service) linkAuth0User(tx *gorm.DB, user *User, auth0UserID string) error {
+	if err := tx.Model(user).Update("auth0_user_id", auth0UserID).Error; err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"user_id":       user.ID,
+			"auth0_user_id": auth0UserID,
+			"error":         err,
+		}).Error("Failed to update user with Auth0 ID")
+		return appErrors.Internal("Failed to link user account")
+	}
+
+	logger.Log.WithFields(logrus.Fields{
+		"user_id":       user.ID,
+		"auth0_user_id": auth0UserID,
+	}).Debug("Linked Auth0 user to database record")
+
+	return nil
+}
+
+// cleanupAuth0User attempts to delete an Auth0 user, logging any errors
+func (s *Service) cleanupAuth0User(auth0UserID string) {
+	if err := s.auth0Client.DeleteUser(auth0UserID); err != nil {
+		logger.Log.WithFields(logrus.Fields{
+			"auth0_user_id": auth0UserID,
+			"error":         err,
+		}).Error("Failed to cleanup Auth0 user after transaction failure")
+	}
 }
 
 func (s *Service) Update(ctx context.Context, id string, input UpdateUserInput) (*User, error) {
@@ -97,7 +225,12 @@ func (s *Service) Update(ctx context.Context, id string, input UpdateUserInput) 
 			"id":    id,
 			"error": result.Error,
 		}).Error("Failed to update user")
-		return nil, result.Error
+		return nil, appErrors.Internal("Failed to update user")
+	}
+
+	if result.RowsAffected == 0 {
+		logger.Log.WithField("id", id).Warn("User not found for update")
+		return nil, appErrors.NotFound("User")
 	}
 
 	if err := s.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
@@ -105,7 +238,7 @@ func (s *Service) Update(ctx context.Context, id string, input UpdateUserInput) 
 			"id":    id,
 			"error": err,
 		}).Error("Failed to fetch updated user")
-		return nil, err
+		return nil, appErrors.Internal("Failed to fetch updated user")
 	}
 
 	logger.Log.WithField("id", id).Info("User updated successfully")
@@ -119,7 +252,11 @@ func (s *Service) Delete(ctx context.Context, id string) error {
 			"id":    id,
 			"error": result.Error,
 		}).Error("Failed to delete user")
-		return result.Error
+		return appErrors.Internal("Failed to delete user")
+	}
+	if result.RowsAffected == 0 {
+		logger.Log.WithField("id", id).Warn("User not found for deletion")
+		return appErrors.NotFound("User")
 	}
 	logger.Log.WithField("id", id).Info("User deleted successfully")
 	return nil
