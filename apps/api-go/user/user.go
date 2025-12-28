@@ -7,15 +7,15 @@ import (
 )
 
 type CreateUserInput struct {
-	FirstName string `gorm:"column:first_name;not null"`
-	LastName  string `gorm:"column:last_name;not null"`
-	Email     string `gorm:"column:email;not null;uniqueIndex"`
-	Password  string `gorm:"-"` // Not stored in DB, used for Auth0 registration
+	FirstName string `json:"firstName" validate:"required,min=1,max=100"`
+	LastName  string `json:"lastName" validate:"required,min=1,max=100"`
+	Email     string `json:"email" validate:"required,email"`
+	Password  string `json:"password" validate:"required,min=8,max=72,password_complexity"`
 }
 
 type UpdateUserInput struct {
-	FirstName *string `gorm:"column:first_name"`
-	LastName  *string `gorm:"column:last_name"`
+	FirstName *string `json:"firstName" validate:"omitempty,min=1,max=100"`
+	LastName  *string `json:"lastName" validate:"omitempty,min=1,max=100"`
 }
 
 type User struct {

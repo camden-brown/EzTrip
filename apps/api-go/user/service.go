@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"eztrip/api-go/auth0"
@@ -36,7 +35,7 @@ func (s *Service) GetAll(ctx context.Context) ([]*User, error) {
 	result := s.db.WithContext(ctx).Order("created_at DESC").Find(&users)
 	if result.Error != nil {
 		logger.Log.WithError(result.Error).Error("Failed to fetch all users")
-		return nil, result.Error
+		return nil, appErrors.Internal("Failed to fetch users")
 	}
 	logger.Log.WithField("count", len(users)).Debug("Fetched users")
 	return users, nil
@@ -65,56 +64,51 @@ func (s *Service) GetByAuth0ID(ctx context.Context, auth0UserID string) (*User, 
 	result := s.db.WithContext(ctx).Where("auth0_user_id = ?", auth0UserID).First(&user)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return nil, nil // Not found, return nil without error
+			logger.Log.WithField("auth0_user_id", auth0UserID).Warn("User not found")
+			return nil, appErrors.NotFound("User")
 		}
 		logger.Log.WithFields(logrus.Fields{
 			"auth0_user_id": auth0UserID,
 			"error":         result.Error,
 		}).Error("Failed to fetch user by Auth0 ID")
-		return nil, result.Error
+		return nil, appErrors.Internal("Failed to fetch user")
 	}
 	logger.Log.WithField("auth0_user_id", auth0UserID).Debug("Fetched user by Auth0 ID")
 	return &user, nil
 }
 
-// GetCurrent returns the current authenticated user.
-//
-// Placeholder implementation: returns the most recently created user.
-// This will be replaced with JWT-based lookup once authentication is added.
 func (s *Service) GetCurrent(ctx context.Context) (*User, error) {
 	var current User
 	result := s.db.WithContext(ctx).Order("created_at DESC").Limit(1).First(&current)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
-			return nil, nil
+			logger.Log.Warn("No current user found")
+			return nil, appErrors.NotFound("User")
 		}
 		logger.Log.WithError(result.Error).Error("Failed to fetch current user")
-		return nil, result.Error
+		return nil, appErrors.Internal("Failed to fetch current user")
 	}
 	return &current, nil
 }
 
 func (s *Service) Create(ctx context.Context, input CreateUserInput) (*User, error) {
 	if s.auth0Client == nil {
-		return nil, fmt.Errorf("auth0 client not initialized")
+		return nil, appErrors.Internal("Auth0 client not initialized")
 	}
 
 	var createdUser *User
 
 	err := s.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// Step 1: Create user in database
 		user, err := s.createUserInDatabase(tx, input)
 		if err != nil {
 			return err
 		}
 
-		// Step 2: Create user in Auth0
 		auth0UserID, err := s.createUserInAuth0(input)
 		if err != nil {
 			return err
 		}
 
-		// Step 3: Link Auth0 user to database record
 		if err := s.linkAuth0User(tx, user, auth0UserID); err != nil {
 			s.cleanupAuth0User(auth0UserID)
 			return err
@@ -142,7 +136,6 @@ func (s *Service) Create(ctx context.Context, input CreateUserInput) (*User, err
 	return createdUser, nil
 }
 
-// createUserInDatabase creates a user record in the database
 func (s *Service) createUserInDatabase(tx *gorm.DB, input CreateUserInput) (*User, error) {
 	user := User{
 		FirstName: input.FirstName,
@@ -151,12 +144,10 @@ func (s *Service) createUserInDatabase(tx *gorm.DB, input CreateUserInput) (*Use
 	}
 
 	if err := tx.Create(&user).Error; err != nil {
-		// Check if it's a unique constraint violation (duplicate email)
-		if strings.Contains(err.Error(), "duplicate key") || strings.Contains(err.Error(), "unique constraint") {
-			logger.Log.WithField("email", input.Email).Warn("Duplicate email attempted")
-			return nil, DuplicateEmailError()
+		if dupErr := s.checkDuplicateEmail(err, input.Email); dupErr != nil {
+			return nil, dupErr
 		}
-		
+
 		logger.Log.WithFields(logrus.Fields{
 			"email": input.Email,
 			"error": err,
@@ -172,7 +163,15 @@ func (s *Service) createUserInDatabase(tx *gorm.DB, input CreateUserInput) (*Use
 	return &user, nil
 }
 
-// createUserInAuth0 creates a user in Auth0 and returns the Auth0 user ID
+func (s *Service) checkDuplicateEmail(err error, email string) error {
+	if strings.Contains(err.Error(), "duplicate key") ||
+		strings.Contains(err.Error(), "unique constraint") {
+		logger.Log.WithField("email", email).Warn("Duplicate email attempted")
+		return DuplicateEmailError()
+	}
+	return nil
+}
+
 func (s *Service) createUserInAuth0(input CreateUserInput) (string, error) {
 	auth0User, err := s.auth0Client.CreateUser(input.Email, input.Password, input.FirstName, input.LastName)
 	if err != nil {
@@ -187,7 +186,6 @@ func (s *Service) createUserInAuth0(input CreateUserInput) (string, error) {
 	return auth0User.UserID, nil
 }
 
-// linkAuth0User updates the database user record with the Auth0 user ID
 func (s *Service) linkAuth0User(tx *gorm.DB, user *User, auth0UserID string) error {
 	if err := tx.Model(user).Update("auth0_user_id", auth0UserID).Error; err != nil {
 		logger.Log.WithFields(logrus.Fields{
@@ -206,7 +204,6 @@ func (s *Service) linkAuth0User(tx *gorm.DB, user *User, auth0UserID string) err
 	return nil
 }
 
-// cleanupAuth0User attempts to delete an Auth0 user, logging any errors
 func (s *Service) cleanupAuth0User(auth0UserID string) {
 	if err := s.auth0Client.DeleteUser(auth0UserID); err != nil {
 		logger.Log.WithFields(logrus.Fields{

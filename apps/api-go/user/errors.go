@@ -6,7 +6,6 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
-// User domain-specific error codes
 const (
 	ErrCodeDuplicateEmail = "USER_DUPLICATE_EMAIL"
 )
