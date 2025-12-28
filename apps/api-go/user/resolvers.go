@@ -38,3 +38,17 @@ func (r *Resolver) CreateUser(ctx context.Context, input CreateUserInput) (*User
 
 	return r.Service.Create(ctx, input)
 }
+
+func (r *Resolver) UpdateUser(ctx context.Context, input UpdateUserInput) (*User, error) {
+	if err := validation.ValidateStruct(input); err != nil {
+		return nil, err
+	}
+
+	auth0UserID := middleware.GetUserIDFromContext(ctx)
+	user, err := r.Service.GetByAuth0ID(ctx, auth0UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	return r.Service.Update(ctx, user.ID, input)
+}
