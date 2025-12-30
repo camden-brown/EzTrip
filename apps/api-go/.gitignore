@@ -1,3 +1,29 @@
+# Git
+.git
+.gitignore
+
+# Development
+.env
+.env.*
+*.dev
+tmp/
+.air.toml
+
+# IDE
+.vscode/
+.idea/
+
+# Build artifacts
+main
+*.exe
+
+# Docs
+README.md
+*.md
+
+# Tests
+*_test.go
+
 # Binaries
 *.exe
 *.exe~

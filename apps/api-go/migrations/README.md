@@ -49,20 +49,3 @@ docker-compose up
    ```
 3. Restart the API - table will be created automatically
 
-### Manual SQL (Legacy)
-
-Old SQL files in this directory are kept for reference but no longer used.
-GORM handles all schema changes automatically.
-
-## Structure
-
-```
-migrations/
-├── migrations.go       # GORM AutoMigrate (active)
-├── 001_create_users.sql  # Legacy SQL (reference only)
-└── README.md
-
-seeds/
-├── seeds.go           # GORM seed data (active)
-└── users.sql          # Legacy SQL (reference only)
-```

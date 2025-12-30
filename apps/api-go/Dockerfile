@@ -19,17 +19,26 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
 # Run stage
 FROM alpine:latest
 
-RUN apk --no-cache add ca-certificates
+RUN apk --no-cache add ca-certificates wget
 
-WORKDIR /root/
+# Add non-root user
+RUN addgroup -g 1001 -S appuser && \
+    adduser -u 1001 -S appuser -G appuser
+
+WORKDIR /home/appuser
 
 # Copy the binary from builder
-COPY --from=builder /app/main .
+COPY --from=builder --chown=appuser:appuser /app/main .
 
-# Copy migrations and seeds
-COPY --from=builder /app/migrations ./migrations
-COPY --from=builder /app/seeds ./seeds
+# Copy runtime dependencies
+COPY --from=builder --chown=appuser:appuser /app/migrations ./migrations
+COPY --from=builder --chown=appuser:appuser /app/rbac/rbac_model.conf ./rbac/rbac_model.conf
+
+USER appuser
 
 EXPOSE 8080
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1
 
 CMD ["./main"]

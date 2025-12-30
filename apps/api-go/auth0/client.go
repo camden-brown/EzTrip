@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 	"time"
@@ -180,6 +181,44 @@ func (c *Client) CreateUser(email, password, firstName, lastName string) (*Auth0
 	}
 
 	return &auth0User, nil
+}
+
+// GetUserByEmail retrieves a user from Auth0 by email address
+func (c *Client) GetUserByEmail(email string) (*Auth0User, error) {
+	if err := c.getAccessToken(); err != nil {
+		return nil, fmt.Errorf("failed to get access token: %w", err)
+	}
+
+	urlPath := fmt.Sprintf("/api/v2/users-by-email?email=%s", url.QueryEscape(email))
+	resp, err := c.makeAuthenticatedRequest(http.MethodGet, c.buildURL(urlPath), nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get user from auth0: %w", err)
+	}
+	defer resp.Body.Close()
+
+	body, err := readResponseBody(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode == http.StatusNotFound {
+		return nil, fmt.Errorf("user not found: %s", email)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("auth0 get user failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	var users []Auth0User
+	if err := json.Unmarshal(body, &users); err != nil {
+		return nil, fmt.Errorf("failed to decode auth0 user response: %w", err)
+	}
+
+	if len(users) == 0 {
+		return nil, fmt.Errorf("user not found: %s", email)
+	}
+
+	return &users[0], nil
 }
 
 // getAuth0Connection returns the Auth0 connection to use, with fallback to default

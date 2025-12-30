@@ -23,18 +23,10 @@ var (
 	ErrInvalidToken     = errors.New("invalid token")
 	ErrMissingSubClaim  = errors.New("token missing sub claim")
 	ErrInvalidIssuerURL = errors.New("invalid issuer URL")
+	ErrUserNotFound     = errors.New("user not found in database")
 )
 
-type userIDContextKey struct{}
-
-// GetUserIDFromContext retrieves the authenticated user's ID (sub claim) from the request context.
-// Returns empty string if not authenticated.
-func GetUserIDFromContext(ctx context.Context) string {
-	if userID, ok := ctx.Value(userIDContextKey{}).(string); ok {
-		return userID
-	}
-	return ""
-}
+type validatedClaimsContextKey struct{}
 
 // Auth0CustomClaims represents custom claims in Auth0 JWT tokens.
 type Auth0CustomClaims struct {
@@ -141,20 +133,17 @@ func createTokenValidator(cfg Auth0Config) (TokenValidator, error) {
 // Auth0JWTMiddleware creates a Gin middleware for Auth0 JWT validation.
 func Auth0JWTMiddleware(tokenValidator TokenValidator) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// Skip validation for OPTIONS requests
 		if c.Request.Method == http.MethodOptions {
 			c.Next()
 			return
 		}
 
-		// Extract token
 		tokenString := extractBearerToken(c.GetHeader("Authorization"))
 		if tokenString == "" {
 			respondWithError(c, http.StatusUnauthorized, ErrMissingToken)
 			return
 		}
 
-		// Validate token
 		validated, err := tokenValidator.ValidateToken(c.Request.Context(), tokenString)
 		if err != nil {
 			logTokenValidationError(c, err)
@@ -162,15 +151,7 @@ func Auth0JWTMiddleware(tokenValidator TokenValidator) gin.HandlerFunc {
 			return
 		}
 
-		// Extract subject claim
-		userID, err := extractSubjectFromClaims(validated)
-		if err != nil {
-			respondWithError(c, http.StatusUnauthorized, err)
-			return
-		}
-
-		// Store user ID in context
-		c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), userIDContextKey{}, userID))
+		c.Request = c.Request.WithContext(context.WithValue(c.Request.Context(), validatedClaimsContextKey{}, validated))
 		c.Next()
 	}
 }

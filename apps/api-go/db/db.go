@@ -35,11 +35,11 @@ func NewGormDB(cfg Config) (*gorm.DB, error) {
 
 func GetConfigFromEnv() Config {
 	return Config{
-		Host:     getEnv("DB_HOST", "localhost"),
-		Port:     getEnv("DB_PORT", "5432"),
-		User:     getEnv("DB_USER", "postgres"),
-		Password: getEnv("DB_PASSWORD", "postgres"),
-		Database: getEnv("DB_NAME", "eztrip"),
+		Host:     getEnv("POSTGRES_HOST", "localhost"),
+		Port:     getEnv("POSTGRES_PORT", "5432"),
+		User:     getEnv("POSTGRES_USER", "postgres"),
+		Password: getEnv("POSTGRES_PASSWORD", "postgres"),
+		Database: getEnv("POSTGRES_NAME", "eztrip"),
 	}
 }
 

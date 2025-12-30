@@ -1,10 +1,27 @@
 package user
 
 import (
+	"context"
 	"time"
 
 	"gorm.io/gorm"
 )
+
+type userUUIDContextKey struct{}
+
+// SetUserUUID stores the authenticated user's UUID in the request context.
+func SetUserUUID(ctx context.Context, userUUID string) context.Context {
+	return context.WithValue(ctx, userUUIDContextKey{}, userUUID)
+}
+
+// GetUserUUID retrieves the authenticated user's UUID from the request context.
+// Returns empty string if not authenticated or user not found.
+func GetUserUUID(ctx context.Context) string {
+	if userUUID, ok := ctx.Value(userUUIDContextKey{}).(string); ok {
+		return userUUID
+	}
+	return ""
+}
 
 type CreateUserInput struct {
 	FirstName string `json:"firstName" validate:"required,min=1,max=100"`

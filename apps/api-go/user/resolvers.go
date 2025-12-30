@@ -2,8 +2,9 @@ package user
 
 import (
 	"context"
+	"fmt"
 
-	"eztrip/api-go/middleware"
+	"eztrip/api-go/rbac"
 	"eztrip/api-go/validation"
 )
 
@@ -18,22 +19,33 @@ func NewResolver(service *Service) *Resolver {
 }
 
 func (r *Resolver) CurrentUser(ctx context.Context) (*User, error) {
-	auth0UserID := middleware.GetUserIDFromContext(ctx)
-
-	return r.Service.GetByAuth0ID(ctx, auth0UserID)
+	userUUID := GetUserUUID(ctx)
+	return r.Service.GetByID(ctx, userUUID)
 }
 
 func (r *Resolver) Users(ctx context.Context) ([]*User, error) {
+	userUUID := GetUserUUID(ctx)
+
+	if err := rbac.RequireAdminRole(ctx, userUUID); err != nil {
+		return nil, err
+	}
+
 	return r.Service.GetAll(ctx)
 }
 
 func (r *Resolver) User(ctx context.Context, id string) (*User, error) {
+	userUUID := GetUserUUID(ctx)
+
+	if err := rbac.RequireAdminRole(ctx, userUUID); err != nil {
+		return nil, err
+	}
+
 	return r.Service.GetByID(ctx, id)
 }
 
 func (r *Resolver) CreateUser(ctx context.Context, input CreateUserInput) (*User, error) {
 	if err := validation.ValidateStruct(input); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("validation failed: %w", err)
 	}
 
 	return r.Service.Create(ctx, input)
@@ -41,14 +53,9 @@ func (r *Resolver) CreateUser(ctx context.Context, input CreateUserInput) (*User
 
 func (r *Resolver) UpdateUser(ctx context.Context, input UpdateUserInput) (*User, error) {
 	if err := validation.ValidateStruct(input); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("validation failed: %w", err)
 	}
 
-	auth0UserID := middleware.GetUserIDFromContext(ctx)
-	user, err := r.Service.GetByAuth0ID(ctx, auth0UserID)
-	if err != nil {
-		return nil, err
-	}
-
-	return r.Service.Update(ctx, user.ID, input)
+	userUUID := GetUserUUID(ctx)
+	return r.Service.Update(ctx, userUUID, input)
 }

@@ -1,101 +1,42 @@
 package main
 
 import (
-	"net/http"
-	"os"
-	"strings"
-
+	"eztrip/api-go/app"
 	"eztrip/api-go/db"
-	"eztrip/api-go/graph"
 	"eztrip/api-go/logger"
-	"eztrip/api-go/middleware"
 	"eztrip/api-go/migrations"
 
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
-type HealthResponse struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
-}
-
 func main() {
-	// Initialize database connection
 	dbConfig := db.GetConfigFromEnv()
 	database, err := db.NewGormDB(dbConfig)
 	if err != nil {
 		logger.Log.Fatalf("Failed to connect to database: %v", err)
 	}
+	logger.Log.WithField("component", "database").Info("Successfully connected to PostgreSQL with GORM")
 
-	logger.Log.Info("Successfully connected to PostgreSQL with GORM")
-
-	// Run migrations
 	if err := migrations.RunMigrations(database); err != nil {
 		logger.Log.Fatalf("Failed to run migrations: %v", err)
 	}
 
-	router := gin.New() // Use gin.New() instead of gin.Default() to configure custom middleware
-
-	// Add middleware
-	router.Use(gin.Recovery())             // Recover from panics
-	router.Use(middleware.RequestLogger()) // Structured request logging
-	router.Use(middleware.ErrorHandler())  // Error handling
-
-	// Configure CORS
-	corsConfig := cors.DefaultConfig()
-
-	// Get allowed origins from environment variable
-	allowedOrigins := os.Getenv("CORS_ALLOWED_ORIGINS")
-	if allowedOrigins != "" {
-		corsConfig.AllowOrigins = strings.Split(allowedOrigins, ",")
-	} else {
-		// Default: allow all origins in development (use specific origins in production)
-		corsConfig.AllowAllOrigins = true
-	}
-
-	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
-	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
-	corsConfig.ExposeHeaders = []string{"Content-Length"}
-	corsConfig.AllowCredentials = true
-
-	router.Use(cors.New(corsConfig))
-
-	// Health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(http.StatusOK, HealthResponse{
-			Status:  "ok",
-			Message: "Travel GraphQL API is running",
-		})
-	})
-
-	// Initialize GraphQL resolver with database
-	resolver := graph.NewResolver(database)
-
-	// GraphQL handler
-	graphqlHandler := handler.NewDefaultServer(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
-	playgroundHandler := playground.Handler("GraphQL Playground", "/graphql")
-
-	auth0JWT, err := middleware.Auth0JWTFromEnv()
+	enforcer, err := app.InitializeRBAC(database)
 	if err != nil {
-		logger.Log.Fatalf("Failed to configure Auth0 JWT middleware: %v", err)
+		logger.Log.Fatalf("Failed to initialize RBAC: %v", err)
 	}
 
-	// GraphQL endpoint (protected with Auth0 JWT)
-	router.POST("/graphql", auth0JWT, func(c *gin.Context) {
-		graphqlHandler.ServeHTTP(c.Writer, c.Request)
-	})
+	router := gin.New()
 
-	// GraphQL playground (development UI only)
-	if gin.Mode() != gin.ReleaseMode {
-		router.GET("/graphql", func(c *gin.Context) {
-			playgroundHandler.ServeHTTP(c.Writer, c.Request)
-		})
-		logger.Log.Info("GraphQL Playground enabled at /graphql")
+	if err := app.SetupMiddleware(router, database, enforcer); err != nil {
+		logger.Log.Fatalf("Failed to configure middleware: %v", err)
 	}
 
-	logger.Log.Info("Starting server on :8080")
+	app.SetupRoutes(router, database)
+
+	logger.Log.WithFields(map[string]interface{}{
+		"component": "server",
+		"port":      "8080",
+	}).Info("Starting server")
 	router.Run(":8080")
 }

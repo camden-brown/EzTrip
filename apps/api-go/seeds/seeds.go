@@ -2,6 +2,7 @@ package seeds
 
 import (
 	"eztrip/api-go/logger"
+	"eztrip/api-go/rbac"
 
 	"gorm.io/gorm"
 )
@@ -11,8 +12,13 @@ import (
 func RunSeeds(db *gorm.DB) error {
 	logger.Log.Info("Running database seeds...")
 
-	// Seed users
-	if err := SeedUsers(db); err != nil {
+	enforcer, err := rbac.NewEnforcer(db)
+	if err != nil {
+		logger.Log.WithField("error", err.Error()).Error("Failed to create RBAC enforcer for seeding")
+		return err
+	}
+
+	if err := SeedUsers(db, enforcer); err != nil {
 		return err
 	}
 

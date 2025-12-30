@@ -90,6 +90,33 @@ Always apply clean code principles to ensure maintainable, readable code:
    - Use structured logging with fields for context
    - Wrap errors to preserve the error chain
 
+9. **Logging Best Practices**
+   - **Log once per error** - typically at the service layer where the failure occurs
+   - **Don't double-log** - if you log an error, don't log it again when returning
+   - **Resolvers/Controllers**: Only log security events (unauthorized access) and add context to errors
+   - **Service Layer**: Log system failures (DB errors, external API failures) and important business events
+   - **Log Levels**:
+     - `Error`: System failures (DB errors, external service failures, unexpected errors)
+     - `Warn`: Security events (unauthorized access, duplicate attempts)
+     - `Info`: Important business operations (user created, updated, deleted)
+     - `Debug`: Development only, remove before production
+   - **Structured Logging**: Always use fields for context: `logger.Log.WithFields(logrus.Fields{...})`
+   - **What to log**:
+     - Errors: Include error details and relevant IDs
+     - Security: User ID, action attempted, role required
+     - Success: Entity ID and operation performed
+   - **What NOT to log**:
+     - Expected errors (not found, validation failures) - return without logging
+     - Debug statements in production code
+     - Passwords, tokens, or sensitive data
+     - Success logs for simple read operations (GET by ID)
+
+10. **Code Documentation**
+   - **Function/Method Documentation**: Always include doc comments for exported functions, methods, types, and constants
+   - **NO Inline Comments**: Do not add inline comments within function bodies - code should be self-documenting through clear naming and structure
+   - If code needs explanation, refactor it to be clearer rather than adding comments
+   - Exception: Complex algorithms or non-obvious business logic may have a brief comment explaining the "why", not the "what"
+
 ### Domain Models
 
 - Use GORM tags for database mapping
@@ -184,19 +211,6 @@ Follow this pattern when adding a new model (e.g., Post):
 
 7. **Create seeds**: `packages/api-go/seeds/post_seeds.go`
    - Add orchestration call in `seeds/seeds.go`
-
-## Environment Variables
-
-Development (docker-compose.yml):
-
-- `DB_HOST=postgres`
-- `DB_PORT=5432`
-- `DB_USER=postgres`
-- `DB_PASSWORD=postgres`
-- `DB_NAME=eztrip`
-- `GIN_MODE=debug` (development mode)
-
-Production: Use `GIN_MODE=release`
 
 ## Nx Commands
 
