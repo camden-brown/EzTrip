@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"eztrip/api-go/app"
 	"eztrip/api-go/db"
 	"eztrip/api-go/logger"
@@ -17,8 +19,10 @@ func main() {
 	}
 	logger.Log.WithField("component", "database").Info("Successfully connected to PostgreSQL with GORM")
 
-	if err := migrations.RunMigrations(database); err != nil {
-		logger.Log.Fatalf("Failed to run migrations: %v", err)
+	if os.Getenv("GIN_MODE") != "release" {
+		if err := migrations.AutoMigrate(database); err != nil {
+			logger.Log.Fatalf("AutoMigrate failed: %v", err)
+		}
 	}
 
 	enforcer, err := app.InitializeRBAC(database)

@@ -51,6 +51,13 @@ func Unauthorized(message string) *gqlerror.Error {
 	return New(ErrCodeUnauthorized, message)
 }
 
+func Forbidden(message string) *gqlerror.Error {
+	if message == "" {
+		message = "You do not have permission to perform this action"
+	}
+	return New(ErrCodeForbidden, message)
+}
+
 func ValidationError(field, message string) *gqlerror.Error {
 	return WithField(
 		New(ErrCodeValidation, message),

@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	appErrors "eztrip/api-go/errors"
 	"eztrip/api-go/logger"
 
 	"github.com/casbin/casbin/v2"
@@ -273,7 +274,7 @@ func RequireAdminRole(ctx context.Context, userUUID string) error {
 			"user_id": userUUID,
 			"role":    "admin",
 		}).Warn("Unauthorized admin access attempt")
-		return ErrUnauthorized
+		return appErrors.Forbidden("You do not have permission to perform this action")
 	}
 
 	return nil
