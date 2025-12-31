@@ -8,7 +8,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// UserLookupMiddleware creates middleware that fetches the User UUID from database using Auth0 ID.
+// UserLookupMiddleware creates middleware that extracts Auth0 ID from JWT and stores it in context.
 // This must be placed after Auth0JWTMiddleware in the middleware chain.
 func UserLookupMiddleware(userService *user.Service) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -27,17 +27,7 @@ func UserLookupMiddleware(userService *user.Service) gin.HandlerFunc {
 			return
 		}
 
-		foundUser, err := userService.GetByAuth0ID(c.Request.Context(), auth0ID)
-		if err != nil {
-			logger.Log.WithFields(logrus.Fields{
-				"auth0_id": auth0ID,
-				"error":    err.Error(),
-			}).Warn("Failed to fetch user by Auth0 ID")
-			c.Next()
-			return
-		}
-
-		c.Request = c.Request.WithContext(user.SetUserUUID(c.Request.Context(), foundUser.ID))
+		c.Request = c.Request.WithContext(user.SetUserAuth0ID(c.Request.Context(), auth0ID))
 		c.Next()
 	}
 }

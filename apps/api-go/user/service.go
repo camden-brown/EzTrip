@@ -185,14 +185,14 @@ func (s *Service) cleanupAuth0User(auth0UserID string) {
 	}
 }
 
-func (s *Service) Update(ctx context.Context, id string, input UpdateUserInput) (*User, error) {
+func (s *Service) Update(ctx context.Context, auth0ID string, input UpdateUserInput) (*User, error) {
 	var user User
 
-	result := s.db.WithContext(ctx).Model(&user).Where("id = ?", id).Updates(input)
+	result := s.db.WithContext(ctx).Model(&user).Where("auth0_user_id = ?", auth0ID).Updates(input)
 	if result.Error != nil {
 		logger.Log.WithFields(logrus.Fields{
-			"id":    id,
-			"error": result.Error,
+			"auth0_user_id": auth0ID,
+			"error":         result.Error,
 		}).Error("Failed to update user")
 		return nil, appErrors.Internal("Failed to update user")
 	}
@@ -201,15 +201,15 @@ func (s *Service) Update(ctx context.Context, id string, input UpdateUserInput) 
 		return nil, appErrors.NotFound("User")
 	}
 
-	if err := s.db.WithContext(ctx).Where("id = ?", id).First(&user).Error; err != nil {
+	if err := s.db.WithContext(ctx).Where("id = ?", &user.ID).First(&user).Error; err != nil {
 		logger.Log.WithFields(logrus.Fields{
-			"id":    id,
+			"id":    &user.ID,
 			"error": err,
 		}).Error("Failed to fetch updated user")
 		return nil, appErrors.Internal("Failed to fetch updated user")
 	}
 
-	logger.Log.WithField("id", id).Info("User updated successfully")
+	logger.Log.WithField("id", &user.ID).Info("User updated successfully")
 	return &user, nil
 }
 

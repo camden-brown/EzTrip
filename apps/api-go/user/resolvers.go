@@ -19,14 +19,20 @@ func NewResolver(service *Service) *Resolver {
 }
 
 func (r *Resolver) CurrentUser(ctx context.Context) (*User, error) {
-	userUUID := GetUserUUID(ctx)
-	return r.Service.GetByID(ctx, userUUID)
+	auth0ID := GetUserAuth0ID(ctx)
+
+	return r.Service.GetByAuth0ID(ctx, auth0ID)
 }
 
 func (r *Resolver) Users(ctx context.Context) ([]*User, error) {
-	userUUID := GetUserUUID(ctx)
+	auth0ID := GetUserAuth0ID(ctx)
 
-	if err := rbac.RequireAdminRole(ctx, userUUID); err != nil {
+	currentUser, err := r.Service.GetByAuth0ID(ctx, auth0ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := rbac.RequireAdminRole(ctx, currentUser.ID); err != nil {
 		return nil, err
 	}
 
@@ -34,9 +40,14 @@ func (r *Resolver) Users(ctx context.Context) ([]*User, error) {
 }
 
 func (r *Resolver) User(ctx context.Context, id string) (*User, error) {
-	userUUID := GetUserUUID(ctx)
+	auth0ID := GetUserAuth0ID(ctx)
 
-	if err := rbac.RequireAdminRole(ctx, userUUID); err != nil {
+	currentUser, err := r.Service.GetByAuth0ID(ctx, auth0ID)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := rbac.RequireAdminRole(ctx, currentUser.ID); err != nil {
 		return nil, err
 	}
 
@@ -56,6 +67,5 @@ func (r *Resolver) UpdateUser(ctx context.Context, input UpdateUserInput) (*User
 		return nil, fmt.Errorf("validation failed: %w", err)
 	}
 
-	userUUID := GetUserUUID(ctx)
-	return r.Service.Update(ctx, userUUID, input)
+	return r.Service.Update(ctx, GetUserAuth0ID(ctx), input)
 }

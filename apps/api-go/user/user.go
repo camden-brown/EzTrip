@@ -10,15 +10,15 @@ import (
 type userUUIDContextKey struct{}
 
 // SetUserUUID stores the authenticated user's UUID in the request context.
-func SetUserUUID(ctx context.Context, userUUID string) context.Context {
-	return context.WithValue(ctx, userUUIDContextKey{}, userUUID)
+func SetUserAuth0ID(ctx context.Context, auth0ID string) context.Context {
+	return context.WithValue(ctx, userUUIDContextKey{}, auth0ID)
 }
 
-// GetUserUUID retrieves the authenticated user's UUID from the request context.
+// GetUserAuth0ID retrieves the authenticated user's Auth0 ID from the request context.
 // Returns empty string if not authenticated or user not found.
-func GetUserUUID(ctx context.Context) string {
-	if userUUID, ok := ctx.Value(userUUIDContextKey{}).(string); ok {
-		return userUUID
+func GetUserAuth0ID(ctx context.Context) string {
+	if auth0ID, ok := ctx.Value(userUUIDContextKey{}).(string); ok {
+		return auth0ID
 	}
 	return ""
 }
