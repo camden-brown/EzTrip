@@ -5,31 +5,15 @@ import { map } from 'rxjs/operators';
 import { GRAPHQL_ENDPOINT } from './graphql.tokens';
 import { print } from 'graphql';
 import type { DocumentNode } from 'graphql';
+import {
+  GraphQLResponse,
+  GraphQLRequestError,
+  GraphQLErrorCode,
+} from './graphql-errors';
 
 export type GraphQLVariables = Record<string, unknown> | undefined;
 
 export type GraphQLDocument = DocumentNode;
-
-export interface GraphQLError {
-  message: string;
-  path?: Array<string | number>;
-  extensions?: Record<string, unknown>;
-}
-
-export interface GraphQLResponse<TData> {
-  data?: TData;
-  errors?: GraphQLError[];
-}
-
-export class GraphQLRequestError extends Error {
-  constructor(
-    message: string,
-    public readonly errors: GraphQLError[],
-  ) {
-    super(message);
-    this.name = 'GraphQLRequestError';
-  }
-}
 
 @Injectable({
   providedIn: 'root',
@@ -39,9 +23,16 @@ export class GraphqlService {
   private readonly endpoint = inject(GRAPHQL_ENDPOINT);
 
   /**
-   * Low-level GraphQL request helper.
+   * Low-level GraphQL request helper with structured error handling
+   * @template TData - The expected response data type
+   * @template TVariables - The variables type for the GraphQL operation
+   * @template TErrorCode - Specific error codes that can occur for this operation
    */
-  request<TData, TVariables extends GraphQLVariables = GraphQLVariables>(
+  request<
+    TData,
+    TVariables extends GraphQLVariables = GraphQLVariables,
+    TErrorCode extends GraphQLErrorCode = GraphQLErrorCode,
+  >(
     document: GraphQLDocument,
     options?: {
       variables?: TVariables;
@@ -57,13 +48,23 @@ export class GraphqlService {
       .pipe(
         map((res) => {
           if (res.errors?.length) {
-            throw new GraphQLRequestError(
-              res.errors[0]?.message ?? 'GraphQL request failed',
+            const primaryError = res.errors[0];
+            console.error('GraphQL Error:', {
+              code: primaryError.extensions?.code,
+              message: primaryError.message,
+              field: primaryError.extensions?.field,
+              path: primaryError.path,
+              totalErrors: res.errors.length,
+            });
+
+            throw new GraphQLRequestError<TErrorCode>(
+              primaryError.message ?? 'GraphQL request failed',
               res.errors,
             );
           }
 
           if (res.data === undefined) {
+            console.error('GraphQL Error: Response contained no data');
             throw new Error('GraphQL response contained no data');
           }
 
@@ -73,28 +74,42 @@ export class GraphqlService {
   }
 
   /**
-   * Semantic wrapper for queries.
+   * Semantic wrapper for queries
+   * @template TData - The expected response data type
+   * @template TVariables - The variables type for the GraphQL query
+   * @template TErrorCode - Specific error codes that can occur for this query
    */
-  query<TData, TVariables extends GraphQLVariables = GraphQLVariables>(
+  query<
+    TData,
+    TVariables extends GraphQLVariables = GraphQLVariables,
+    TErrorCode extends GraphQLErrorCode = GraphQLErrorCode,
+  >(
     document: GraphQLDocument,
     variables?: TVariables,
     operationName?: string,
   ): Observable<TData> {
-    return this.request<TData, TVariables>(document, {
+    return this.request<TData, TVariables, TErrorCode>(document, {
       variables,
       operationName,
     });
   }
 
   /**
-   * Semantic wrapper for mutations.
+   * Semantic wrapper for mutations
+   * @template TData - The expected response data type
+   * @template TVariables - The variables type for the GraphQL mutation
+   * @template TErrorCode - Specific error codes that can occur for this mutation
    */
-  mutate<TData, TVariables extends GraphQLVariables = GraphQLVariables>(
+  mutate<
+    TData,
+    TVariables extends GraphQLVariables = GraphQLVariables,
+    TErrorCode extends GraphQLErrorCode = GraphQLErrorCode,
+  >(
     document: GraphQLDocument,
     variables?: TVariables,
     operationName?: string,
   ): Observable<TData> {
-    return this.request<TData, TVariables>(document, {
+    return this.request<TData, TVariables, TErrorCode>(document, {
       variables,
       operationName,
     });

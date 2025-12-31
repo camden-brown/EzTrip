@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"eztrip/api-go/logger"
-	"eztrip/api-go/user"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -23,7 +22,7 @@ func RunMigrations(db *gorm.DB) error {
 		getEnvOrDefault("POSTGRES_PASSWORD", "postgres"),
 		getEnvOrDefault("POSTGRES_HOST", "localhost"),
 		getEnvOrDefault("POSTGRES_PORT", "5432"),
-		getEnvOrDefault("POSTGRES_NAME", "eztrip"),
+		getEnvOrDefault("POSTGRES_DB", "eztrip"),
 	)
 
 	m, err := migrate.New(
@@ -58,7 +57,7 @@ func RollbackMigration(db *gorm.DB) error {
 		getEnvOrDefault("POSTGRES_PASSWORD", "postgres"),
 		getEnvOrDefault("POSTGRES_HOST", "localhost"),
 		getEnvOrDefault("POSTGRES_PORT", "5432"),
-		getEnvOrDefault("POSTGRES_NAME", "eztrip"),
+		getEnvOrDefault("POSTGRES_DB", "eztrip"),
 	)
 
 	m, err := migrate.New(
@@ -75,22 +74,6 @@ func RollbackMigration(db *gorm.DB) error {
 	}
 
 	logger.Log.Info("Rollback completed successfully")
-	return nil
-}
-
-// AutoMigrate uses GORM's AutoMigrate for development environments
-// This is faster for development but lacks version control and rollback capabilities
-func AutoMigrate(db *gorm.DB) error {
-	logger.Log.Info("Running GORM AutoMigrate...")
-
-	if err := db.AutoMigrate(
-		&user.User{},
-		// Add other models here as you create them
-	); err != nil {
-		return fmt.Errorf("auto migration failed: %w", err)
-	}
-
-	logger.Log.Info("AutoMigrate completed successfully")
 	return nil
 }
 

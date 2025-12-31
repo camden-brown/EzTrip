@@ -11,7 +11,7 @@
 
     <a routerLink="/dashboard" class="logo">
       <span class="logo-icon">✈</span>
-      <span class="logo-text" [class.hidden]="isMobile">EzTrip</span>
+      <span class="logo-text" [class.hidden]="isMobile()">EzTrip</span>
     </a>
   </div>
 
@@ -28,6 +28,7 @@
         matBadgeColor="warn"
         matBadgeSize="small"
         [matBadgeHidden]="notificationCount === 0"
+        aria-hidden="false"
       >
         notifications
       </mat-icon>

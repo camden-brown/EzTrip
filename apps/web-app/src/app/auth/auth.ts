@@ -1,35 +1,36 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
-import { LoginForm, LoginCredentials } from './login-form/login-form';
-import { SignupForm, SignupCredentials } from './signup-form/signup-form';
+import { MatButtonModule } from '@angular/material/button';
+import { Router } from '@angular/router';
+import { AuthService } from '../core/auth/auth.service';
 
 @Component({
   selector: 'eztrip-auth',
-  imports: [CommonModule, MatIconModule, LoginForm, SignupForm],
+  imports: [CommonModule, MatIconModule, MatButtonModule],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Auth {
-  isLoginView = signal(true);
+export class Auth implements OnInit {
+  private readonly auth = inject(AuthService);
+  private readonly router = inject(Router);
   currentYear = new Date().getFullYear();
 
-  onLogin(credentials: LoginCredentials) {
-    console.log('Login:', credentials);
-    // TODO: Implement login logic
+  ngOnInit() {
+    this.auth.isAuthenticated$.subscribe((isAuthenticated) => {
+      if (isAuthenticated) {
+        this.router.navigate(['/dashboard']);
+      }
+    });
   }
 
-  onSignup(credentials: SignupCredentials) {
-    console.log('Signup:', credentials);
-    // TODO: Implement signup logic
-  }
-
-  switchToSignup() {
-    this.isLoginView.set(false);
-  }
-
-  switchToLogin() {
-    this.isLoginView.set(true);
+  login() {
+    this.auth.loginWithRedirect().subscribe();
   }
 }

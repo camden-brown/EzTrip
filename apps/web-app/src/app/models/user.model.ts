@@ -4,3 +4,10 @@ export interface User {
   lastName: string;
   email: string;
 }
+
+/**
+ * User-specific error codes
+ */
+export enum UserErrorCode {
+  DUPLICATE_EMAIL = 'USER_DUPLICATE_EMAIL',
+}

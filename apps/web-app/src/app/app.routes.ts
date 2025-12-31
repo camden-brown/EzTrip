@@ -1,9 +1,10 @@
 import { Route } from '@angular/router';
+import { authGuard } from './core/auth';
 
 export const appRoutes: Route[] = [
   {
     path: '',
-    redirectTo: 'auth',
+    redirectTo: 'dashboard',
     pathMatch: 'full',
   },
   {
@@ -12,6 +13,7 @@ export const appRoutes: Route[] = [
   },
   {
     path: 'dashboard',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./layout/layout.component').then((m) => m.LayoutComponent),
     children: [
@@ -20,9 +22,6 @@ export const appRoutes: Route[] = [
         loadComponent: () =>
           import('./home/home.component').then((m) => m.HomeComponent),
       },
-      // Add more dashboard routes here as the app grows
-      // { path: 'trips', loadComponent: () => import('./trips/trips.component').then(m => m.TripsComponent) },
-      // { path: 'settings', loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent) },
     ],
   },
 ];

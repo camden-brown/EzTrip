@@ -39,7 +39,7 @@ func GetConfigFromEnv() Config {
 		Port:     getEnv("POSTGRES_PORT", "5432"),
 		User:     getEnv("POSTGRES_USER", "postgres"),
 		Password: getEnv("POSTGRES_PASSWORD", "postgres"),
-		Database: getEnv("POSTGRES_NAME", "eztrip"),
+		Database: getEnv("POSTGRES_DB", "eztrip"),
 	}
 }
 

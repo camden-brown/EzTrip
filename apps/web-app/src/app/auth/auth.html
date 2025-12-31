@@ -24,28 +24,29 @@
     </div>
   </div>
 
-  <!-- Right side - Form -->
+  <!-- Right side - Auth0 Login -->
   <div class="auth-form-container">
     <div class="form-wrapper">
       <div class="form-header">
         <mat-icon class="form-logo">flight_takeoff</mat-icon>
-        <h2>Welcome Back</h2>
-        <p class="form-subtitle">Sign in to continue to EZTrip</p>
+        <h2>Welcome to EZTrip</h2>
+        <p class="form-subtitle">
+          Sign in to start planning your next adventure
+        </p>
       </div>
 
-      @if (isLoginView()) {
-      <eztrip-login-form (login)="onLogin($event)" />
-      <div class="form-footer">
-        <span>Don't have an account?</span>
-        <a (click)="switchToSignup()" class="switch-link">Sign up here</a>
+      <div class="auth-actions">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="login()"
+          class="login-button"
+        >
+          <mat-icon>login</mat-icon>
+          Continue with Auth0
+        </button>
+        <p class="auth-note">You'll be redirected to our secure login page</p>
       </div>
-      } @else {
-      <eztrip-signup-form (signup)="onSignup($event)" />
-      <div class="form-footer">
-        <span>Already have an account?</span>
-        <a (click)="switchToLogin()" class="switch-link">Sign in here</a>
-      </div>
-      }
 
       <div class="copyright">
         <span>Copyright © {{ currentYear }} EZTrip</span>

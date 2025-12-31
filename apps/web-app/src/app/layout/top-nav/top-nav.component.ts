@@ -1,9 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  EventEmitter,
-  Input,
-  Output,
+  inject,
+  input,
+  output,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -15,6 +15,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { RouterModule } from '@angular/router';
 import { NotificationsComponent } from './notifications/notifications.component';
 import { ProfileMenuComponent } from './profile-menu/profile-menu.component';
+import { AuthService } from '../../core/auth/auth.service';
 
 @Component({
   selector: 'eztrip-top-nav',
@@ -36,8 +37,10 @@ import { ProfileMenuComponent } from './profile-menu/profile-menu.component';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TopNavComponent {
-  @Input() isMobile = false;
-  @Output() menuToggle = new EventEmitter<void>();
+  private readonly auth = inject(AuthService);
+
+  isMobile = input(false);
+  menuToggle = output<void>();
 
   notificationCount = 3;
 
@@ -46,7 +49,10 @@ export class TopNavComponent {
   }
 
   onLogout(): void {
-    // TODO: Implement logout logic
-    console.log('Logout clicked');
+    this.auth
+      .logout({
+        logoutParams: { returnTo: window.location.origin + '/auth' },
+      })
+      .subscribe();
   }
 }

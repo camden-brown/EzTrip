@@ -16,6 +16,7 @@
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/web-app",
+        "index": "apps/web-app/src/index.html",
         "browser": "apps/web-app/src/main.ts",
         "tsConfig": "apps/web-app/tsconfig.app.json",
         "assets": [
@@ -24,12 +25,7 @@
             "input": "apps/web-app/public"
           }
         ],
-        "styles": ["apps/web-app/src/styles.scss"],
-        "server": "apps/web-app/src/main.server.ts",
-        "ssr": {
-          "entry": "apps/web-app/src/server.ts"
-        },
-        "outputMode": "server"
+        "styles": ["apps/web-app/src/styles.scss"]
       },
       "configurations": {
         "production": {

@@ -1,6 +1,8 @@
 package seeds
 
 import (
+	"fmt"
+
 	"eztrip/api-go/auth0"
 	"eztrip/api-go/logger"
 	"eztrip/api-go/rbac"
@@ -24,35 +26,111 @@ type userWithRole struct {
 
 // SeedUsers populates the users table with sample data and assigns RBAC roles
 func SeedUsers(db *gorm.DB, enforcer *casbin.Enforcer) error {
-	if usersAlreadyExist(db) {
-		logger.Log.Info("Users already seeded, skipping...")
-		return nil
-	}
-
 	logger.Log.Info("Seeding users...")
 
 	auth0Client := initializeAuth0Client()
-	usersToSeed := buildUserList()
+	
+	// Sync existing Auth0 users to database
+	if auth0Client != nil {
+		if err := syncAuth0Users(db, enforcer, auth0Client); err != nil {
+			logger.Log.WithError(err).Warn("Failed to sync Auth0 users, continuing with local seeds")
+		}
+	}
 
-	seedAllUsers(db, enforcer, auth0Client, usersToSeed)
+	// Seed additional local test users
+	usersToSeed := buildUserList()
+	seedAllUsers(db, enforcer, usersToSeed)
 
 	logSeedingSummary(usersToSeed)
 	return nil
 }
 
-func usersAlreadyExist(db *gorm.DB) bool {
-	var count int64
-	db.Model(&user.User{}).Count(&count)
-	return count > 0
-}
-
 func initializeAuth0Client() *auth0.Client {
 	auth0Client, err := auth0.NewClient()
 	if err != nil {
-		logger.Log.WithField("error", err.Error()).Warn("Auth0 client not configured, seeding without Auth0 IDs")
+		logger.Log.WithField("error", err.Error()).Warn("Auth0 client not configured, skipping Auth0 sync")
 		return nil
 	}
 	return auth0Client
+}
+
+func syncAuth0Users(db *gorm.DB, enforcer *casbin.Enforcer, auth0Client *auth0.Client) error {
+	logger.Log.Info("Fetching users from Auth0...")
+	
+	auth0Users, err := auth0Client.ListUsers()
+	if err != nil {
+		return fmt.Errorf("failed to list Auth0 users: %w", err)
+	}
+
+	logger.Log.WithField("count", len(auth0Users)).Info("Found Auth0 users")
+
+	for _, auth0User := range auth0Users {
+		// Check if user already exists in database by auth0_user_id
+		var existingUser user.User
+		err := db.Where("auth0_user_id = ?", auth0User.UserID).First(&existingUser).Error
+		if err == nil {
+			logger.Log.WithFields(logrus.Fields{
+				"email":    auth0User.Email,
+				"auth0_id": auth0User.UserID,
+			}).Debug("Auth0 user already exists in database")
+			continue
+		}
+
+		// Check if user exists by email (from local seeds)
+		err = db.Where("email = ?", auth0User.Email).First(&existingUser).Error
+		if err == nil {
+			// Update existing user with Auth0 ID
+			existingUser.Auth0UserID = &auth0User.UserID
+			existingUser.FirstName = auth0User.FirstName
+			existingUser.LastName = auth0User.LastName
+			if err := db.Save(&existingUser).Error; err != nil {
+				logger.Log.WithFields(logrus.Fields{
+					"email": auth0User.Email,
+					"error": err.Error(),
+				}).Warn("Failed to update user with Auth0 ID")
+				continue
+			}
+
+			logger.Log.WithFields(logrus.Fields{
+				"user_id":  existingUser.ID,
+				"email":    auth0User.Email,
+				"auth0_id": auth0User.UserID,
+			}).Info("Updated existing user with Auth0 ID")
+			continue
+		}
+
+		// Create new user from Auth0
+		newUser := user.User{
+			Auth0UserID: &auth0User.UserID,
+			FirstName:   auth0User.FirstName,
+			LastName:    auth0User.LastName,
+			Email:       auth0User.Email,
+		}
+
+		if err := db.Create(&newUser).Error; err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"email": auth0User.Email,
+				"error": err.Error(),
+			}).Warn("Failed to create user from Auth0")
+			continue
+		}
+
+		// Assign default user role
+		if err := rbac.AddRoleForUser(enforcer, newUser.ID, roleUser); err != nil {
+			logger.Log.WithFields(logrus.Fields{
+				"user_id": newUser.ID,
+				"error":   err.Error(),
+			}).Warn("Failed to assign role to Auth0 user")
+		}
+
+		logger.Log.WithFields(logrus.Fields{
+			"user_id":  newUser.ID,
+			"email":    auth0User.Email,
+			"auth0_id": auth0User.UserID,
+		}).Info("Synced Auth0 user to database")
+	}
+
+	return nil
 }
 
 func buildUserList() []userWithRole {
@@ -82,9 +160,9 @@ func buildUserList() []userWithRole {
 	return usersToSeed
 }
 
-func seedAllUsers(db *gorm.DB, enforcer *casbin.Enforcer, auth0Client *auth0.Client, usersToSeed []userWithRole) {
+func seedAllUsers(db *gorm.DB, enforcer *casbin.Enforcer, usersToSeed []userWithRole) {
 	for _, uwr := range usersToSeed {
-		if err := seedUserWithRole(db, enforcer, auth0Client, &uwr.user, uwr.role); err != nil {
+		if err := seedUserWithRole(db, enforcer, &uwr.user, uwr.role); err != nil {
 			logger.Log.WithFields(logrus.Fields{
 				"email": uwr.user.Email,
 				"role":  uwr.role,
@@ -113,10 +191,18 @@ func logSeedingSummary(usersToSeed []userWithRole) {
 	}).Info("Successfully seeded users with roles")
 }
 
-func seedUserWithRole(db *gorm.DB, enforcer *casbin.Enforcer, auth0Client *auth0.Client, u *user.User, role string) error {
-	auth0ID := getOrCreateAuth0User(auth0Client, u)
-	u.Auth0UserID = auth0ID
+func seedUserWithRole(db *gorm.DB, enforcer *casbin.Enforcer, u *user.User, role string) error {
+	// Check if user already exists in database by email
+	var existingUser user.User
+	err := db.Where("email = ?", u.Email).First(&existingUser).Error
+	if err == nil {
+		logger.Log.WithFields(logrus.Fields{
+			"email": u.Email,
+		}).Info("User already exists in database, skipping")
+		return nil
+	}
 
+	// Real users will be auto-provisioned with Auth0 ID on first login
 	if err := createUserInDatabase(db, u); err != nil {
 		return err
 	}
@@ -125,49 +211,8 @@ func seedUserWithRole(db *gorm.DB, enforcer *casbin.Enforcer, auth0Client *auth0
 		return err
 	}
 
-	logSuccessfulSeed(u, role, auth0ID)
+	logSuccessfulSeed(u, role, nil)
 	return nil
-}
-
-func getOrCreateAuth0User(auth0Client *auth0.Client, u *user.User) *string {
-	if auth0Client == nil {
-		return nil
-	}
-
-	auth0User, err := auth0Client.CreateUser(u.Email, defaultPassword, u.FirstName, u.LastName)
-	if err != nil {
-		logger.Log.WithFields(logrus.Fields{
-			"email": u.Email,
-			"error": err.Error(),
-		}).Warn("Failed to create user in Auth0, checking if user already exists")
-
-		return fetchExistingAuth0User(auth0Client, u.Email)
-	}
-
-	logger.Log.WithFields(logrus.Fields{
-		"email":    u.Email,
-		"auth0_id": auth0User.UserID,
-	}).Info("Created user in Auth0")
-
-	return &auth0User.UserID
-}
-
-func fetchExistingAuth0User(auth0Client *auth0.Client, email string) *string {
-	existingUser, err := auth0Client.GetUserByEmail(email)
-	if err != nil {
-		logger.Log.WithFields(logrus.Fields{
-			"email": email,
-			"error": err.Error(),
-		}).Warn("Failed to fetch existing user from Auth0, continuing without Auth0 ID")
-		return nil
-	}
-
-	logger.Log.WithFields(logrus.Fields{
-		"email":    email,
-		"auth0_id": existingUser.UserID,
-	}).Info("Found existing user in Auth0")
-
-	return &existingUser.UserID
 }
 
 func createUserInDatabase(db *gorm.DB, u *user.User) error {

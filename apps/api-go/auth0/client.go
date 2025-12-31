@@ -254,6 +254,40 @@ func (c *Client) DeleteUser(userID string) error {
 	return nil
 }
 
+// ListUsers retrieves all users from Auth0
+func (c *Client) ListUsers() ([]*Auth0User, error) {
+	if err := c.getAccessToken(); err != nil {
+		return nil, fmt.Errorf("failed to get access token: %w", err)
+	}
+
+	url := c.buildURL(pathUsers)
+	resp, err := c.makeAuthenticatedRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list users from auth0: %w", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		body, err := readResponseBody(resp)
+		if err != nil {
+			return nil, fmt.Errorf("auth0 list users failed with status %d: %w", resp.StatusCode, err)
+		}
+		return nil, fmt.Errorf("auth0 list users failed with status %d: %s", resp.StatusCode, string(body))
+	}
+
+	body, err := readResponseBody(resp)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read list users response: %w", err)
+	}
+
+	var users []*Auth0User
+	if err := json.Unmarshal(body, &users); err != nil {
+		return nil, fmt.Errorf("failed to parse list users response: %w", err)
+	}
+
+	return users, nil
+}
+
 // makeAuthenticatedRequest creates and executes an authenticated HTTP request
 func (c *Client) makeAuthenticatedRequest(method, url string, body io.Reader) (*http.Response, error) {
 	req, err := http.NewRequest(method, url, body)
