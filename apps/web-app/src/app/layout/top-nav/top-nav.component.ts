@@ -1,10 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  inject,
-  input,
-  output,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -39,14 +33,7 @@ import { AuthService } from '../../core/auth/auth.service';
 export class TopNavComponent {
   private readonly auth = inject(AuthService);
 
-  isMobile = input(false);
-  menuToggle = output<void>();
-
   notificationCount = 3;
-
-  onMenuToggle(): void {
-    this.menuToggle.emit();
-  }
 
   onLogout(): void {
     this.auth

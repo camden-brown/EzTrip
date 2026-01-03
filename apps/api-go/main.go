@@ -5,6 +5,9 @@ import (
 	"eztrip/api-go/db"
 	"eztrip/api-go/logger"
 
+	// Register LLM providers
+	_ "eztrip/api-go/llm/xai"
+
 	"github.com/gin-gonic/gin"
 )
 

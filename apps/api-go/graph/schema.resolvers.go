@@ -8,6 +8,7 @@ package graph
 import (
 	"context"
 	"eztrip/api-go/graph/model"
+	"eztrip/api-go/trip"
 	"eztrip/api-go/user"
 	"fmt"
 )
@@ -32,11 +33,25 @@ func (r *queryResolver) User(ctx context.Context, id string) (*user.User, error)
 	return r.UserResolver.User(ctx, id)
 }
 
+// TripSuggestion is the resolver for the tripSuggestion field.
+func (r *queryResolver) TripSuggestion(ctx context.Context, prompt string) (string, error) {
+	return r.TripResolver.TripSuggestion(ctx, prompt)
+}
+
+// ID is the resolver for the id field.
+func (r *tripResolver) ID(ctx context.Context, obj *trip.Trip) (string, error) {
+	return obj.ID.String(), nil
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Trip returns TripResolver implementation.
+func (r *Resolver) Trip() TripResolver { return &tripResolver{r} }
+
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type tripResolver struct{ *Resolver }

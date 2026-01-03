@@ -1,3 +1,78 @@
-<div class="dashboard">
-  <h1>Dashboard</h1>
+<div class="home">
+  <main class="home__content">
+    @if (!aiResponse && !isLoading) {
+      <!-- Welcome State -->
+      <div class="home__welcome">
+        <div class="home__greeting">
+          <mat-icon class="home__greeting-icon">auto_awesome</mat-icon>
+          <span class="home__greeting-text">{{ greeting$ | async }}</span>
+        </div>
+        <h1 class="home__welcome-title">Plan your next adventure with AI</h1>
+
+        <!-- Centered Prompt Input -->
+        <div class="home__prompt-container">
+          <textarea
+            class="home__prompt-input"
+            [(ngModel)]="promptText"
+            placeholder="Describe your dream trip..."
+            rows="1"
+            (keydown.enter)="$event.preventDefault(); submitPrompt()"
+            [disabled]="isLoading"
+          ></textarea>
+          <button
+            mat-icon-button
+            class="home__prompt-submit"
+            (click)="submitPrompt()"
+            [disabled]="isLoading || !promptText.trim()"
+            aria-label="Submit"
+          >
+            <mat-icon>send</mat-icon>
+          </button>
+        </div>
+
+        <!-- Suggestion Chips -->
+        <div class="home__suggestions">
+          @for (suggestion of suggestions; track suggestion.label) {
+            <button
+              mat-stroked-button
+              class="home__suggestion"
+              (click)="useSuggestion(suggestion)"
+            >
+              <span class="home__suggestion-icon">{{ suggestion.icon }}</span>
+              <span class="home__suggestion-label">{{ suggestion.label }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+
+    @if (isLoading) {
+      <!-- Loading State -->
+      <div class="home__loading">
+        <mat-spinner diameter="40"></mat-spinner>
+        <p class="home__loading-text">Planning your trip...</p>
+      </div>
+    }
+
+    @if (aiResponse) {
+      <!-- Response -->
+      <div class="home__response">
+        <div class="home__response-header">
+          <mat-icon>auto_awesome</mat-icon>
+          <span>AI Suggestion</span>
+        </div>
+        <div class="home__response-content">{{ aiResponse }}</div>
+        <div class="home__response-actions">
+          <button mat-stroked-button (click)="clearResponse()">
+            <mat-icon>refresh</mat-icon>
+            New search
+          </button>
+          <button mat-flat-button color="primary">
+            <mat-icon>bookmark</mat-icon>
+            Save trip
+          </button>
+        </div>
+      </div>
+    }
+  </main>
 </div>

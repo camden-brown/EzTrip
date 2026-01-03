@@ -25,14 +25,6 @@
   gap: 0.5rem;
 }
 
-.menu-toggle {
-  color: $text-secondary;
-
-  &:hover {
-    background: $bg-hover;
-  }
-}
-
 .logo {
   display: flex;
   align-items: center;
@@ -44,14 +36,6 @@
 
   .logo-icon {
     font-size: 1.5rem;
-  }
-
-  .logo-text {
-    transition: opacity 0.2s ease;
-
-    &.hidden {
-      display: none;
-    }
   }
 }
 

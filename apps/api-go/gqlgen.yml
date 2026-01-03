@@ -162,3 +162,8 @@ models:
   User:
     model:
       - eztrip/api-go/user.User
+
+  # Use custom domain model for Trip
+  Trip:
+    model:
+      - eztrip/api-go/trip.Trip

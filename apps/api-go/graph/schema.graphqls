@@ -7,6 +7,10 @@ type User {
   email: String!
 }
 
+type Trip {
+  id: ID!
+}
+
 input CreateUserInput {
   firstName: String!
   lastName: String!
@@ -20,6 +24,9 @@ type Query {
   currentUser: User
   users: [User!]!
   user(id: ID!): User
+  
+  # AI-powered travel suggestion
+  tripSuggestion(prompt: String!): String!
 }
 
 type Mutation {

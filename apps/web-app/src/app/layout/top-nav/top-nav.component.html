@@ -1,21 +1,22 @@
 <mat-toolbar class="top-nav">
   <div class="nav-left">
-    <button
-      mat-icon-button
-      class="menu-toggle"
-      (click)="onMenuToggle()"
-      aria-label="Toggle navigation menu"
-    >
-      <mat-icon>menu</mat-icon>
-    </button>
-
-    <a routerLink="/dashboard" class="logo">
+    <a routerLink="/" class="logo">
       <span class="logo-icon">✈</span>
-      <span class="logo-text" [class.hidden]="isMobile()">EzTrip</span>
+      <span class="logo-text">EzTrip</span>
     </a>
   </div>
 
   <div class="nav-right">
+    <!-- Trips -->
+    <a
+      mat-icon-button
+      routerLink="/trips"
+      aria-label="My trips"
+      class="nav-icon-btn"
+    >
+      <mat-icon>luggage</mat-icon>
+    </a>
+
     <!-- Notifications -->
     <button
       mat-icon-button

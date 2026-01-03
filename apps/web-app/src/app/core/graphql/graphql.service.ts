@@ -11,8 +11,6 @@ import {
   GraphQLErrorCode,
 } from './graphql-errors';
 
-export type GraphQLVariables = Record<string, unknown> | undefined;
-
 export type GraphQLDocument = DocumentNode;
 
 @Injectable({
@@ -30,7 +28,7 @@ export class GraphqlService {
    */
   request<
     TData,
-    TVariables extends GraphQLVariables = GraphQLVariables,
+    TVariables,
     TErrorCode extends GraphQLErrorCode = GraphQLErrorCode,
   >(
     document: GraphQLDocument,
@@ -81,7 +79,7 @@ export class GraphqlService {
    */
   query<
     TData,
-    TVariables extends GraphQLVariables = GraphQLVariables,
+    TVariables,
     TErrorCode extends GraphQLErrorCode = GraphQLErrorCode,
   >(
     document: GraphQLDocument,
@@ -102,7 +100,7 @@ export class GraphqlService {
    */
   mutate<
     TData,
-    TVariables extends GraphQLVariables = GraphQLVariables,
+    TVariables,
     TErrorCode extends GraphQLErrorCode = GraphQLErrorCode,
   >(
     document: GraphQLDocument,

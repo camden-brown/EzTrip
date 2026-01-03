@@ -1,6 +1,7 @@
 package graph
 
 import (
+	"eztrip/api-go/trip"
 	"eztrip/api-go/user"
 
 	"gorm.io/gorm"
@@ -12,14 +13,16 @@ import (
 // here.
 
 type Resolver struct {
-	UserService  *user.Service
 	UserResolver *user.Resolver
+	TripResolver *trip.Resolver
 }
 
 func NewResolver(db *gorm.DB) *Resolver {
 	userService := user.NewService(db)
+	tripService := trip.NewService(db)
+
 	return &Resolver{
-		UserService:  userService,
 		UserResolver: user.NewResolver(userService),
+		TripResolver: trip.NewResolver(tripService),
 	}
 }
