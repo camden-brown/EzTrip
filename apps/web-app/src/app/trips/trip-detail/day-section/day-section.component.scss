@@ -1,9 +1,47 @@
-@use '../../../styles/variables' as *;
+@use 'styles/variables' as *;
 
 .day-section {
   margin-bottom: 1.5rem;
 
-  .day-header {
+  &--closest {
+    .day-section__header {
+      background: linear-gradient(
+        135deg,
+        rgba($color-accent, 0.25) 0%,
+        rgba($color-accent-light, 0.2) 100%
+      );
+      border: 2px solid $color-accent-light;
+      box-shadow: 0 0.25rem 1rem rgba($color-accent-light, 0.2);
+
+      &:hover {
+        background: linear-gradient(
+          135deg,
+          rgba($color-accent, 0.35) 0%,
+          rgba($color-accent-light, 0.3) 100%
+        );
+        border-color: $color-accent-lighter;
+        box-shadow: 0 0.25rem 1.25rem rgba($color-accent-light, 0.3);
+      }
+    }
+
+    .day-section__number {
+      background: $color-accent;
+      color: $text-white;
+      box-shadow: 0 0.125rem 0.5rem rgba($color-accent, 0.4);
+    }
+
+    .day-section__date {
+      color: $text-white;
+      line-height: 1.25rem;
+    }
+
+    .day-section__relative {
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: 400;
+    }
+  }
+
+  &__header {
     width: 100%;
     display: flex;
     align-items: center;
@@ -21,14 +59,20 @@
     }
   }
 
-  .day-info {
+  &__info {
     display: flex;
     align-items: center;
     gap: 1rem;
     text-align: left;
   }
 
-  .day-number {
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__number {
     font-size: 0.75rem;
     font-weight: 700;
     text-transform: uppercase;
@@ -39,37 +83,38 @@
     border-radius: 0.25rem;
   }
 
-  .day-date {
+  &__date {
     margin: 0;
     font-size: 1.125rem;
+    line-height: 1.25rem;
     font-weight: 600;
     color: $text-primary;
   }
 
-  .day-relative {
-    font-size: 0.875rem;
-    color: $text-tertiary;
-    font-weight: 500;
+  &__relative {
+    font-size: 0.75rem;
+    color: $text-hint;
+    font-weight: 400;
   }
 
-  .expand-icon {
+  &__expand-icon {
     color: $text-tertiary;
     transition: transform 0.3s ease;
 
-    &.expanded {
+    &--expanded {
       transform: rotate(180deg);
     }
   }
 
-  .day-content {
+  &__content {
     padding: 1.5rem 0 0 0;
   }
 
-  .activities-timeline {
+  &__timeline {
     padding-left: 0.5rem;
   }
 
-  .add-activity-btn {
+  &__add-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;

@@ -1,0 +1,92 @@
+<div
+  class="activity-panel__backdrop"
+  [class.activity-panel__backdrop--open]="isOpen()"
+  (click)="onBackdropClick()"
+>
+  <aside
+    class="activity-panel"
+    [class.activity-panel--open]="isOpen()"
+    (click)="onPanelClick($event)"
+  >
+    <div class="activity-panel__header">
+      <button
+        mat-icon-button
+        (click)="close.emit()"
+        class="activity-panel__close"
+      >
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="activity-panel__content">
+      @if (activity().images.length > 0) {
+        <div class="activity-panel__hero">
+          <img
+            [src]="activity().images[0]"
+            [alt]="activity().title"
+            class="activity-panel__hero-image"
+          />
+        </div>
+      }
+
+      <div class="activity-panel__main">
+        <div class="activity-panel__title-section">
+          <div class="activity-panel__icon-title">
+            <mat-icon class="activity-panel__category-icon">{{
+              activity().category | categoryIcon
+            }}</mat-icon>
+            <h2 class="activity-panel__title">{{ activity().title }}</h2>
+          </div>
+        </div>
+
+        <p class="activity-panel__description">{{ activity().description }}</p>
+
+        <div class="activity-panel__category-tags">
+          <span class="activity-panel__tag">{{
+            activity().category | categoryLabel
+          }}</span>
+        </div>
+
+        <div class="activity-panel__meta">
+          <div class="activity-panel__rating-inline">
+            <mat-icon class="activity-panel__star-icon">star</mat-icon>
+            <span class="activity-panel__rating-value">{{
+              activity().rating
+            }}</span>
+            <span class="activity-panel__review-text"
+              >({{ activity().reviewCount }})</span
+            >
+          </div>
+        </div>
+
+        <a
+          [href]="
+            'https://www.google.com/maps/search/?api=1&query=' +
+            encodeURIComponent(activity().address)
+          "
+          target="_blank"
+          rel="noopener noreferrer"
+          class="activity-panel__location-info"
+        >
+          <mat-icon>location_on</mat-icon>
+          <span>{{ activity().location }}</span>
+        </a>
+
+        <a
+          [href]="activity().website"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="activity-panel__website-link"
+        >
+          <mat-icon>open_in_new</mat-icon>
+          <span>Visit Website</span>
+        </a>
+      </div>
+
+      <div class="activity-panel__section">
+        <h3 class="activity-panel__section-title">Notes</h3>
+        <p class="activity-panel__text">{{ activity().notes }}</p>
+      </div>
+    </div>
+  </aside>
+</div>

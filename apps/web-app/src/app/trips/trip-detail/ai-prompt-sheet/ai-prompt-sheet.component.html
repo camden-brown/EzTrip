@@ -1,25 +1,25 @@
 <div
-  class="prompt-overlay"
-  [class.visible]="isVisible()"
+  class="ai-prompt__overlay"
+  [class.ai-prompt__overlay--visible]="isVisible()"
   (click)="onBackdropClick()"
 >
   <div
-    class="prompt-sheet"
-    [class.visible]="isVisible()"
+    class="ai-prompt"
+    [class.ai-prompt--visible]="isVisible()"
     (click)="$event.stopPropagation()"
   >
-    <div class="prompt-header">
-      <h3>Add to your itinerary</h3>
-      <button mat-icon-button (click)="closeSheet()">
+    <div class="ai-prompt__header">
+      <h3 class="ai-prompt__title">Add to your itinerary</h3>
+      <button mat-icon-button (click)="closeSheet()" class="ai-prompt__close">
         <mat-icon>close</mat-icon>
       </button>
     </div>
 
-    <div class="prompt-content">
-      <div class="prompt-input-wrapper">
+    <div class="ai-prompt__content">
+      <div class="ai-prompt__input-wrapper">
         <textarea
           #promptInput
-          class="prompt-input"
+          class="ai-prompt__input"
           placeholder="Describe what you'd like to add... (e.g., 'Find a kid-friendly beach near Poipu' or 'Suggest a dinner spot with ocean views')"
           [value]="promptText()"
           (input)="updatePrompt($event)"
@@ -27,7 +27,7 @@
           rows="3"
         ></textarea>
         <button
-          class="submit-btn"
+          class="ai-prompt__submit"
           mat-fab
           color="primary"
           [disabled]="!promptText().trim()"
@@ -37,18 +37,18 @@
         </button>
       </div>
 
-      <div class="prompt-suggestions">
-        <span class="suggestions-label">Suggestions:</span>
+      <div class="ai-prompt__suggestions">
+        <span class="ai-prompt__suggestions-label">Suggestions:</span>
         <button
           mat-stroked-button
-          class="suggestion-chip"
+          class="ai-prompt__chip"
           (click)="promptText.set('Find a kid-friendly restaurant nearby')"
         >
           Kid-friendly restaurant
         </button>
         <button
           mat-stroked-button
-          class="suggestion-chip"
+          class="ai-prompt__chip"
           (click)="
             promptText.set('Suggest a beach activity for young children')
           "
@@ -57,14 +57,14 @@
         </button>
         <button
           mat-stroked-button
-          class="suggestion-chip"
+          class="ai-prompt__chip"
           (click)="promptText.set('Find a hotel or place to stay')"
         >
           Place to stay
         </button>
         <button
           mat-stroked-button
-          class="suggestion-chip"
+          class="ai-prompt__chip"
           (click)="promptText.set('Easy hike with scenic views')"
         >
           Easy scenic hike

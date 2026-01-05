@@ -1,0 +1,48 @@
+<div class="day-section" [class.day-section--closest]="isClosestDay()">
+  <button class="day-section__header" (click)="toggleExpanded()">
+    <div class="day-section__info">
+      <span class="day-section__number">Day {{ dayNumber() }}</span>
+      <div class="day-section__text">
+        <h2 class="day-section__date">{{ formattedDate().fullDate }}</h2>
+        @if (formattedDate().relativeText) {
+          <span class="day-section__relative">{{
+            formattedDate().relativeText
+          }}</span>
+        }
+      </div>
+    </div>
+    <mat-icon
+      class="day-section__expand-icon"
+      [class.day-section__expand-icon--expanded]="isExpanded()"
+    >
+      expand_more
+    </mat-icon>
+  </button>
+
+  @if (isExpanded()) {
+    <div class="day-section__content" @expandCollapse>
+      <div class="day-section__timeline">
+        @for (
+          activity of day().activities;
+          track activity.id;
+          let last = $last
+        ) {
+          <eztrip-activity-card
+            [activity]="activity"
+            [isLast]="last"
+            (click)="onActivityClick(activity)"
+          />
+        }
+      </div>
+
+      <button
+        class="day-section__add-btn"
+        mat-stroked-button
+        (click)="onAddActivity()"
+      >
+        <mat-icon>add</mat-icon>
+        <span>Add to this day</span>
+      </button>
+    </div>
+  }
+</div>

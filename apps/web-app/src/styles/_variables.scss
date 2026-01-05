@@ -32,6 +32,18 @@ $color-warning: #ff9800;
 $color-warning-light: #ffb74d;
 
 // ---------------------------------------------
+// Category Colors
+// ---------------------------------------------
+$color-category-beach: #00bcd4;
+$color-category-hike: #4caf50;
+$color-category-food: #ff9800;
+$color-category-hotel: #9c27b0;
+$color-category-activity: #e91e63;
+$color-category-transport: #607d8b;
+$color-category-shopping: #f06292;
+$color-category-entertainment: #ffc107;
+
+// ---------------------------------------------
 // Text Colors
 // ---------------------------------------------
 $text-primary: rgba(255, 255, 255, 0.95);
@@ -50,6 +62,7 @@ $border-medium: rgba(255, 255, 255, 0.12);
 // ---------------------------------------------
 // Background Colors
 // ---------------------------------------------
+$bg-base: $color-primary-darkest;
 $bg-primary: $color-primary-darkest;
 $bg-secondary: $color-primary-darker;
 $bg-elevated: $color-primary-dark;

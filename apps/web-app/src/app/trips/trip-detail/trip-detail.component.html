@@ -24,7 +24,10 @@
         <eztrip-day-section
           [day]="day"
           [dayNumber]="i + 1"
+          [initiallyExpanded]="i === getClosestDayIndex()"
+          [isClosestDay]="i === getClosestDayIndex()"
           (addActivity)="onAddActivity($event)"
+          (activityClick)="onActivityClick($event)"
         />
       }
     </div>
@@ -35,5 +38,13 @@
   <eztrip-ai-prompt-sheet
     (close)="onPromptClose()"
     (submit)="onPromptSubmit($event)"
+  />
+}
+
+@if (selectedActivity()) {
+  <eztrip-activity-detail-panel
+    [activity]="selectedActivity()!"
+    [isOpen]="isPanelOpen()"
+    (close)="onPanelClose()"
   />
 }

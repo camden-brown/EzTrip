@@ -1,11 +1,25 @@
-@use '../../../styles/variables' as *;
+@use 'styles/variables' as *;
 
 .activity-card {
   display: flex;
   position: relative;
   padding-bottom: 1.5rem;
+  cursor: pointer;
 
-  .timeline-marker {
+  &:hover {
+    .activity-card__details {
+      border-color: $color-primary-light;
+      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.2);
+      transform: translateX(0.25rem);
+    }
+
+    .activity-card__marker {
+      transform: scale(1.1);
+      box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  &__marker {
     position: relative;
     z-index: 1;
     display: flex;
@@ -17,6 +31,9 @@
     background: $bg-elevated;
     border: 2px solid $color-primary-light;
     flex-shrink: 0;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
 
     mat-icon {
       font-size: 1.25rem;
@@ -26,63 +43,63 @@
     }
 
     &.category-beach {
-      border-color: #00bcd4;
+      border-color: $color-category-beach;
       mat-icon {
-        color: #00bcd4;
+        color: $color-category-beach;
       }
     }
 
     &.category-hike {
-      border-color: #4caf50;
+      border-color: $color-category-hike;
       mat-icon {
-        color: #4caf50;
+        color: $color-category-hike;
       }
     }
 
     &.category-food {
-      border-color: #ff9800;
+      border-color: $color-category-food;
       mat-icon {
-        color: #ff9800;
+        color: $color-category-food;
       }
     }
 
     &.category-hotel {
-      border-color: #9c27b0;
+      border-color: $color-category-hotel;
       mat-icon {
-        color: #9c27b0;
+        color: $color-category-hotel;
       }
     }
 
     &.category-activity {
-      border-color: #e91e63;
+      border-color: $color-category-activity;
       mat-icon {
-        color: #e91e63;
+        color: $color-category-activity;
       }
     }
 
     &.category-transport {
-      border-color: #607d8b;
+      border-color: $color-category-transport;
       mat-icon {
-        color: #607d8b;
+        color: $color-category-transport;
       }
     }
 
     &.category-shopping {
-      border-color: #f06292;
+      border-color: $color-category-shopping;
       mat-icon {
-        color: #f06292;
+        color: $color-category-shopping;
       }
     }
 
     &.category-entertainment {
-      border-color: #ffeb3b;
+      border-color: $color-category-entertainment;
       mat-icon {
-        color: #ffeb3b;
+        color: $color-category-entertainment;
       }
     }
   }
 
-  .timeline-connector {
+  &__connector {
     position: absolute;
     left: calc(1.25rem - 1px);
     top: 2.5rem;
@@ -90,18 +107,18 @@
     width: 2px;
     background: $border-medium;
 
-    &.hidden {
+    &--hidden {
       display: none;
     }
   }
 
-  .activity-content {
+  &__content {
     margin-left: 1rem;
     flex: 1;
     min-width: 0;
   }
 
-  .activity-time {
+  &__time {
     font-size: 0.75rem;
     font-weight: 600;
     color: $text-tertiary;
@@ -110,26 +127,25 @@
     margin-bottom: 0.25rem;
   }
 
-  .activity-details {
+  &__details {
     background: $bg-elevated;
     border-radius: 0.75rem;
     padding: 1rem;
     border: 1px solid $border-light;
-    transition: border-color 0.2s ease;
-
-    &:hover {
-      border-color: $border-medium;
-    }
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
   }
 
-  .activity-title {
+  &__title {
     margin: 0 0 0.5rem 0;
     font-size: 1rem;
     font-weight: 600;
     color: $text-primary;
   }
 
-  .activity-location {
+  &__location {
     display: flex;
     align-items: center;
     gap: 0.25rem;
@@ -144,7 +160,7 @@
     }
   }
 
-  .activity-description {
+  &__description {
     margin: 0;
     font-size: 0.875rem;
     color: $text-secondary;

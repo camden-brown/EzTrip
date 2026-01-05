@@ -112,10 +112,11 @@ Always apply clean code principles to ensure maintainable, readable code:
      - Success logs for simple read operations (GET by ID)
 
 10. **Code Documentation**
-   - **Function/Method Documentation**: Always include doc comments for exported functions, methods, types, and constants
-   - **NO Inline Comments**: Do not add inline comments within function bodies - code should be self-documenting through clear naming and structure
-   - If code needs explanation, refactor it to be clearer rather than adding comments
-   - Exception: Complex algorithms or non-obvious business logic may have a brief comment explaining the "why", not the "what"
+
+- **Function/Method Documentation**: Always include doc comments for exported functions, methods, types, and constants
+- **NO Inline Comments**: Do not add inline comments within function bodies - code should be self-documenting through clear naming and structure
+- If code needs explanation, refactor it to be clearer rather than adding comments
+- Exception: Complex algorithms or non-obvious business logic may have a brief comment explaining the "why", not the "what"
 
 ### Domain Models
 
@@ -251,17 +252,26 @@ Multi-stage Dockerfile builds optimized binary from source. The `seed-init` serv
 - **Use OnPush change detection** - always add `changeDetection: ChangeDetectionStrategy.OnPush` for child components
   - Import: `import { ChangeDetectionStrategy } from '@angular/core';`
   - Improves performance by reducing change detection cycles
-  - Required for all presentational/child components
+  - Required for all presentational/child components (not route-level components)
+  - Use signal inputs/outputs for reactive state management
 - **Standalone components** - use standalone: true for all new components
 - **Smart/Dumb pattern** - separate container (smart) from presentational (dumb) components
+  - Route components are smart (no OnPush)
+  - Child components are dumb (OnPush enabled)
 
 ### CSS/SCSS Conventions
 
+- **Use BEM naming convention** - follow Block Element Modifier methodology for all CSS classes
+  - Block: `.component-name` (e.g., `.day-section`, `.activity-card`)
+  - Element: `.block__element` (e.g., `.day-section__header`, `.activity-card__title`)
+  - Modifier: `.block--modifier` or `.block__element--modifier` (e.g., `.day-section--closest`, `.activity-card__connector--hidden`)
+  - Use `&` in SCSS for cleaner nesting: `.block { &__element {} &--modifier {} }`
+  - Avoid deep nesting - BEM creates flat, maintainable structure
 - **Use relative units** - prefer `rem`, `em`, `%`, `vh`, `vw` over `px`
   - `rem` for font sizes, spacing, and most dimensions
   - `em` for component-relative sizing
   - `%` or viewport units for responsive layouts
-- **Use SCSS variables** - import from `styles/_variables.scss` for colors
+- **Use SCSS variables** - import from `styles/_variables.scss` for colors and theme support
 - Base font size is 16px, so `1rem = 16px`
 
 ## GraphQL Playground

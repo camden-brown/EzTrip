@@ -4,13 +4,14 @@ import {
   output,
   signal,
   computed,
+  effect,
   ChangeDetectionStrategy,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DateTime } from 'luxon';
-import { ItineraryDay } from '../../models/trip.model';
+import { ItineraryDay, Activity } from '../../../models/trip.model';
 import { ActivityCardComponent } from '../activity-card/activity-card.component';
 
 @Component({
@@ -29,10 +30,21 @@ import { ActivityCardComponent } from '../activity-card/activity-card.component'
 export class DaySectionComponent {
   day = input.required<ItineraryDay>();
   dayNumber = input.required<number>();
+  initiallyExpanded = input<boolean>(false);
+  isClosestDay = input<boolean>(false);
 
   addActivity = output<string>();
+  activityClick = output<Activity>();
 
-  isExpanded = signal(true);
+  isExpanded = signal(false);
+
+  constructor() {
+    effect(() => {
+      if (!this.isExpanded()) {
+        this.isExpanded.set(this.initiallyExpanded());
+      }
+    });
+  }
 
   formattedDate = computed(() => {
     const date = DateTime.fromISO(this.day().date);
@@ -63,5 +75,9 @@ export class DaySectionComponent {
 
   onAddActivity(): void {
     this.addActivity.emit(this.day().date);
+  }
+
+  onActivityClick(activity: Activity): void {
+    this.activityClick.emit(activity);
   }
 }

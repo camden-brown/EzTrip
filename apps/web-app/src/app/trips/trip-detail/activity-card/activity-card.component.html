@@ -1,0 +1,24 @@
+<div class="activity-card" (click)="click.emit(activity())">
+  <div
+    class="activity-card__marker"
+    [class]="getCategoryClass(activity().category)"
+  >
+    <mat-icon>{{ activity().category | categoryIcon }}</mat-icon>
+  </div>
+  <div
+    class="activity-card__connector"
+    [class.activity-card__connector--hidden]="isLast()"
+  ></div>
+
+  <div class="activity-card__content">
+    <div class="activity-card__time">{{ formattedTime() }}</div>
+    <div class="activity-card__details">
+      <h3 class="activity-card__title">{{ activity().title }}</h3>
+      <div class="activity-card__location">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ activity().location }}</span>
+      </div>
+      <p class="activity-card__description">{{ activity().description }}</p>
+    </div>
+  </div>
+</div>

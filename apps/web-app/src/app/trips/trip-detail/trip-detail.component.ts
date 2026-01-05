@@ -3,10 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { Trip } from '../../models/trip.model';
+import { DateTime } from 'luxon';
+import { Trip, Activity } from '../../models/trip.model';
 import { TripMockService } from '../trip-mock.service';
-import { DaySectionComponent } from '../day-section/day-section.component';
-import { AiPromptSheetComponent } from '../ai-prompt-sheet/ai-prompt-sheet.component';
+import { DaySectionComponent } from './day-section/day-section.component';
+import { AiPromptSheetComponent } from './ai-prompt-sheet/ai-prompt-sheet.component';
+import { ActivityDetailPanelComponent } from './activity-detail-panel/activity-detail-panel.component';
 
 @Component({
   selector: 'eztrip-trip-detail',
@@ -17,6 +19,7 @@ import { AiPromptSheetComponent } from '../ai-prompt-sheet/ai-prompt-sheet.compo
     MatButtonModule,
     DaySectionComponent,
     AiPromptSheetComponent,
+    ActivityDetailPanelComponent,
   ],
   templateUrl: './trip-detail.component.html',
   styleUrl: './trip-detail.component.scss',
@@ -31,6 +34,8 @@ export class TripDetailComponent implements OnInit {
   selectedDate = signal<string | null>(null);
   expandedSections = signal<Set<string>>(new Set());
   enableScrollAnimation = signal(true);
+  selectedActivity = signal<Activity | null>(null);
+  isPanelOpen = signal(false);
 
   ngOnInit(): void {
     const tripId = this.route.snapshot.paramMap.get('id');
@@ -42,6 +47,27 @@ export class TripDetailComponent implements OnInit {
         this.router.navigate(['/trips']);
       }
     }
+  }
+
+  getClosestDayIndex(): number {
+    const trip = this.trip();
+    if (!trip || !trip.itinerary.length) return 0;
+
+    const now = DateTime.now().startOf('day');
+    let closestIndex = 0;
+    let smallestDiff = Number.MAX_SAFE_INTEGER;
+
+    trip.itinerary.forEach((day, index) => {
+      const dayDate = DateTime.fromISO(day.date).startOf('day');
+      const diff = Math.abs(dayDate.diff(now, 'days').days);
+
+      if (diff < smallestDiff) {
+        smallestDiff = diff;
+        closestIndex = index;
+      }
+    });
+
+    return closestIndex;
   }
 
   onAddActivity(date: string): void {
@@ -65,5 +91,17 @@ export class TripDetailComponent implements OnInit {
 
   goBack(): void {
     this.router.navigate(['/trips']);
+  }
+
+  onActivityClick(activity: Activity): void {
+    this.selectedActivity.set(activity);
+    this.isPanelOpen.set(true);
+  }
+
+  onPanelClose(): void {
+    this.isPanelOpen.set(false);
+    setTimeout(() => {
+      this.selectedActivity.set(null);
+    }, 300);
   }
 }
