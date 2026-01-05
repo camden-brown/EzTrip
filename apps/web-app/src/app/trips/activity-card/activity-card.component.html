@@ -1,0 +1,20 @@
+<div class="activity-card">
+  <div class="timeline-marker" [class]="getCategoryClass(activity().category)">
+    <mat-icon>{{ getCategoryIcon(activity().category) }}</mat-icon>
+  </div>
+  <div class="timeline-connector" [class.hidden]="isLast()"></div>
+
+  <div class="activity-content">
+    <div class="activity-time">{{ formattedTime() }}</div>
+    <div class="activity-details">
+      <h3 class="activity-title">{{ activity().title }}</h3>
+      <div class="activity-location">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ activity().location }}</span>
+      </div>
+      @if (activity().description) {
+        <p class="activity-description">{{ activity().description }}</p>
+      }
+    </div>
+  </div>
+</div>

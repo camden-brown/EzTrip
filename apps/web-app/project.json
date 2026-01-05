@@ -25,7 +25,10 @@
             "input": "apps/web-app/public"
           }
         ],
-        "styles": ["apps/web-app/src/styles.scss"]
+        "styles": ["apps/web-app/src/styles.scss"],
+        "stylePreprocessorOptions": {
+          "includePaths": ["apps/web-app/src"]
+        }
       },
       "configurations": {
         "production": {

@@ -1,0 +1,37 @@
+<div class="day-section">
+  <button class="day-header" (click)="toggleExpanded()">
+    <div class="day-info">
+      <span class="day-number">Day {{ dayNumber() }}</span>
+      <h2 class="day-date">{{ formattedDate().fullDate }}</h2>
+      @if (formattedDate().relativeText) {
+        <span class="day-relative">{{ formattedDate().relativeText }}</span>
+      }
+    </div>
+    <mat-icon class="expand-icon" [class.expanded]="isExpanded()">
+      expand_more
+    </mat-icon>
+  </button>
+
+  @if (isExpanded()) {
+    <div class="day-content" @expandCollapse>
+      <div class="activities-timeline">
+        @for (
+          activity of day().activities;
+          track activity.id;
+          let last = $last
+        ) {
+          <eztrip-activity-card [activity]="activity" [isLast]="last" />
+        }
+      </div>
+
+      <button
+        class="add-activity-btn"
+        mat-stroked-button
+        (click)="onAddActivity()"
+      >
+        <mat-icon>add</mat-icon>
+        <span>Add to this day</span>
+      </button>
+    </div>
+  }
+</div>

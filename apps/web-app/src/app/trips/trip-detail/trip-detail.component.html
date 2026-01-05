@@ -1,0 +1,39 @@
+@if (trip(); as tripData) {
+  <div class="trip-detail-container">
+    <header class="trip-header">
+      <button mat-icon-button class="back-btn" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="trip-info">
+        <h1 class="trip-title">{{ tripData.title }}</h1>
+        <div class="trip-meta">
+          <span class="trip-destination">
+            <mat-icon>location_on</mat-icon>
+            {{ tripData.destination }}
+          </span>
+          <span class="trip-travelers">
+            <mat-icon>group</mat-icon>
+            {{ tripData.travelers }} travelers
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <div class="itinerary-content">
+      @for (day of tripData.itinerary; track day.date; let i = $index) {
+        <eztrip-day-section
+          [day]="day"
+          [dayNumber]="i + 1"
+          (addActivity)="onAddActivity($event)"
+        />
+      }
+    </div>
+  </div>
+}
+
+@if (isPromptOpen()) {
+  <eztrip-ai-prompt-sheet
+    (close)="onPromptClose()"
+    (submit)="onPromptSubmit($event)"
+  />
+}

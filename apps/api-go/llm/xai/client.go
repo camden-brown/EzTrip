@@ -24,7 +24,7 @@ func init() {
 
 const (
 	apiURL         = "https://api.x.ai/v1/chat/completions"
-	defaultModel   = "grok-beta"
+	defaultModel   = "grok-4-1-fast-reasoning"
 	defaultTimeout = 30 * time.Second
 	envAPIKey      = "XAI_API_KEY"
 )

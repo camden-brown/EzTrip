@@ -1,0 +1,94 @@
+@use '../../../styles/variables' as *;
+
+.day-section {
+  margin-bottom: 1.5rem;
+
+  .day-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    background: $bg-secondary;
+    border: 1px solid $border-light;
+    border-radius: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: $bg-elevated;
+      border-color: $border-medium;
+    }
+  }
+
+  .day-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+  }
+
+  .day-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: $color-accent-light;
+    background: rgba($color-accent, 0.15);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+  }
+
+  .day-date {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  .day-relative {
+    font-size: 0.875rem;
+    color: $text-tertiary;
+    font-weight: 500;
+  }
+
+  .expand-icon {
+    color: $text-tertiary;
+    transition: transform 0.3s ease;
+
+    &.expanded {
+      transform: rotate(180deg);
+    }
+  }
+
+  .day-content {
+    padding: 1.5rem 0 0 0;
+  }
+
+  .activities-timeline {
+    padding-left: 0.5rem;
+  }
+
+  .add-activity-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    margin-left: 3.5rem;
+    color: $text-secondary;
+    border-color: $border-medium;
+    border-style: dashed;
+
+    &:hover {
+      background: $bg-hover;
+      border-color: $color-accent-light;
+      color: $color-accent-light;
+    }
+
+    mat-icon {
+      font-size: 1.25rem;
+      width: 1.25rem;
+      height: 1.25rem;
+    }
+  }
+}
