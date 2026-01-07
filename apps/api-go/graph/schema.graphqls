@@ -9,6 +9,57 @@ type User {
 
 type Trip {
   id: ID!
+  ownerId: ID!
+  title: String!
+  destination: String!
+  startDate: String!
+  endDate: String!
+  travelers: Int!
+  itinerary: [ItineraryDay!]!
+  collaborators: [TripCollaborator!]!
+}
+
+type ItineraryDay {
+  id: ID!
+  tripId: ID!
+  date: String!
+  dayNumber: Int!
+  activities: [Activity!]!
+}
+
+type Activity {
+  id: ID!
+  itineraryDayId: ID!
+  placeId: ID
+  type: ActivityType!
+  time: String!
+  title: String!
+  location: String
+  category: ActivityCategory!
+  description: String
+  notes: String
+}
+
+enum ActivityType {
+  place_based
+  custom
+  transport
+}
+
+enum ActivityCategory {
+  beach
+  hike
+  food
+  hotel
+  activity
+  transport
+  shopping
+  entertainment
+}
+
+type TripCollaborator {
+  tripId: ID!
+  userId: ID!
 }
 
 input CreateUserInput {
@@ -24,7 +75,12 @@ type Query {
   currentUser: User
   users: [User!]!
   user(id: ID!): User
-  
+
+  # Trip queries
+  trips: [Trip!]!
+  trip(id: ID!): Trip
+  activity(id: ID!): Activity
+
   # AI-powered travel suggestion
   tripSuggestion(prompt: String!): String!
 }

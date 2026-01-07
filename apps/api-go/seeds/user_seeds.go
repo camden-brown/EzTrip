@@ -116,7 +116,7 @@ func syncAuth0Users(db *gorm.DB, enforcer *casbin.Enforcer, auth0Client *auth0.C
 		}
 
 		// Assign default user role
-		if err := rbac.AddRoleForUser(enforcer, newUser.ID, roleUser); err != nil {
+		if err := rbac.AddRoleForUser(enforcer, newUser.ID.String(), roleUser); err != nil {
 			logger.Log.WithFields(logrus.Fields{
 				"user_id": newUser.ID,
 				"error":   err.Error(),
@@ -223,7 +223,7 @@ func createUserInDatabase(db *gorm.DB, u *user.User) error {
 }
 
 func assignRoleToUser(enforcer *casbin.Enforcer, u *user.User, role string) error {
-	if err := rbac.AddRoleForUser(enforcer, u.ID, role); err != nil {
+	if err := rbac.AddRoleForUser(enforcer, u.ID.String(), role); err != nil {
 		logger.Log.WithFields(logrus.Fields{
 			"user_id": u.ID,
 			"email":   u.Email,

@@ -163,7 +163,27 @@ models:
     model:
       - eztrip/api-go/user.User
 
-  # Use custom domain model for Trip
+  # Use custom domain models for Trip
   Trip:
     model:
       - eztrip/api-go/trip.Trip
+  
+  ItineraryDay:
+    model:
+      - eztrip/api-go/trip.ItineraryDay
+  
+  Activity:
+    model:
+      - eztrip/api-go/trip.Activity
+  
+  ActivityType:
+    model:
+      - eztrip/api-go/trip.ActivityType
+  
+  ActivityCategory:
+    model:
+      - eztrip/api-go/trip.ActivityCategory
+  
+  TripCollaborator:
+    model:
+      - eztrip/api-go/trip.TripCollaborator

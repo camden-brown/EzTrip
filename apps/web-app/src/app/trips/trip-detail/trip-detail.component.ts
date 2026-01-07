@@ -4,8 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DateTime } from 'luxon';
-import { Trip, Activity } from '../../models/trip.model';
-import { TripMockService } from '../trip-mock.service';
+import { Activity } from '../../models/trip.model';
+import { TripService } from '../trip.service';
 import { DaySectionComponent } from './day-section/day-section.component';
 import { AiPromptSheetComponent } from './ai-prompt-sheet/ai-prompt-sheet.component';
 import { ActivityDetailPanelComponent } from './activity-detail-panel/activity-detail-panel.component';
@@ -27,9 +27,8 @@ import { ActivityDetailPanelComponent } from './activity-detail-panel/activity-d
 export class TripDetailComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
-  private tripService = inject(TripMockService);
+  protected readonly tripService = inject(TripService);
 
-  trip = signal<Trip | null>(null);
   isPromptOpen = signal(false);
   selectedDate = signal<string | null>(null);
   expandedSections = signal<Set<string>>(new Set());
@@ -40,17 +39,14 @@ export class TripDetailComponent implements OnInit {
   ngOnInit(): void {
     const tripId = this.route.snapshot.paramMap.get('id');
     if (tripId) {
-      const trip = this.tripService.getTripById(tripId);
-      if (trip) {
-        this.trip.set(trip);
-      } else {
-        this.router.navigate(['/trips']);
-      }
+      this.tripService.loadTripById(tripId);
+    } else {
+      this.router.navigate(['/trips']);
     }
   }
 
   getClosestDayIndex(): number {
-    const trip = this.trip();
+    const trip = this.tripService.currentTrip();
     if (!trip || !trip.itinerary.length) return 0;
 
     const now = DateTime.now().startOf('day');

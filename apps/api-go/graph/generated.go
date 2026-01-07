@@ -41,28 +41,69 @@ type Config struct {
 }
 
 type ResolverRoot interface {
+	Activity() ActivityResolver
+	ItineraryDay() ItineraryDayResolver
 	Mutation() MutationResolver
 	Query() QueryResolver
 	Trip() TripResolver
+	TripCollaborator() TripCollaboratorResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Activity struct {
+		Category       func(childComplexity int) int
+		Description    func(childComplexity int) int
+		ID             func(childComplexity int) int
+		ItineraryDayID func(childComplexity int) int
+		Location       func(childComplexity int) int
+		Notes          func(childComplexity int) int
+		PlaceID        func(childComplexity int) int
+		Time           func(childComplexity int) int
+		Title          func(childComplexity int) int
+		Type           func(childComplexity int) int
+	}
+
+	ItineraryDay struct {
+		Activities func(childComplexity int) int
+		Date       func(childComplexity int) int
+		DayNumber  func(childComplexity int) int
+		ID         func(childComplexity int) int
+		TripID     func(childComplexity int) int
+	}
+
 	Mutation struct {
 		CreateUser func(childComplexity int, input model.CreateUserInput) int
 	}
 
 	Query struct {
+		Activity       func(childComplexity int, id string) int
 		CurrentUser    func(childComplexity int) int
+		Trip           func(childComplexity int, id string) int
 		TripSuggestion func(childComplexity int, prompt string) int
+		Trips          func(childComplexity int) int
 		User           func(childComplexity int, id string) int
 		Users          func(childComplexity int) int
 	}
 
 	Trip struct {
-		ID func(childComplexity int) int
+		Collaborators func(childComplexity int) int
+		Destination   func(childComplexity int) int
+		EndDate       func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Itinerary     func(childComplexity int) int
+		OwnerID       func(childComplexity int) int
+		StartDate     func(childComplexity int) int
+		Title         func(childComplexity int) int
+		Travelers     func(childComplexity int) int
+	}
+
+	TripCollaborator struct {
+		TripID func(childComplexity int) int
+		UserID func(childComplexity int) int
 	}
 
 	User struct {
@@ -73,6 +114,19 @@ type ComplexityRoot struct {
 	}
 }
 
+type ActivityResolver interface {
+	ID(ctx context.Context, obj *trip.Activity) (string, error)
+	ItineraryDayID(ctx context.Context, obj *trip.Activity) (string, error)
+	PlaceID(ctx context.Context, obj *trip.Activity) (*string, error)
+
+	Time(ctx context.Context, obj *trip.Activity) (string, error)
+}
+type ItineraryDayResolver interface {
+	ID(ctx context.Context, obj *trip.ItineraryDay) (string, error)
+	TripID(ctx context.Context, obj *trip.ItineraryDay) (string, error)
+	Date(ctx context.Context, obj *trip.ItineraryDay) (string, error)
+	DayNumber(ctx context.Context, obj *trip.ItineraryDay) (int32, error)
+}
 type MutationResolver interface {
 	CreateUser(ctx context.Context, input model.CreateUserInput) (*user.User, error)
 }
@@ -80,10 +134,25 @@ type QueryResolver interface {
 	CurrentUser(ctx context.Context) (*user.User, error)
 	Users(ctx context.Context) ([]*user.User, error)
 	User(ctx context.Context, id string) (*user.User, error)
+	Trips(ctx context.Context) ([]*trip.Trip, error)
+	Trip(ctx context.Context, id string) (*trip.Trip, error)
+	Activity(ctx context.Context, id string) (*trip.Activity, error)
 	TripSuggestion(ctx context.Context, prompt string) (string, error)
 }
 type TripResolver interface {
 	ID(ctx context.Context, obj *trip.Trip) (string, error)
+	OwnerID(ctx context.Context, obj *trip.Trip) (string, error)
+
+	StartDate(ctx context.Context, obj *trip.Trip) (string, error)
+	EndDate(ctx context.Context, obj *trip.Trip) (string, error)
+	Travelers(ctx context.Context, obj *trip.Trip) (int32, error)
+}
+type TripCollaboratorResolver interface {
+	TripID(ctx context.Context, obj *trip.TripCollaborator) (string, error)
+	UserID(ctx context.Context, obj *trip.TripCollaborator) (string, error)
+}
+type UserResolver interface {
+	ID(ctx context.Context, obj *user.User) (string, error)
 }
 
 type executableSchema struct {
@@ -105,6 +174,98 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Activity.category":
+		if e.complexity.Activity.Category == nil {
+			break
+		}
+
+		return e.complexity.Activity.Category(childComplexity), true
+	case "Activity.description":
+		if e.complexity.Activity.Description == nil {
+			break
+		}
+
+		return e.complexity.Activity.Description(childComplexity), true
+	case "Activity.id":
+		if e.complexity.Activity.ID == nil {
+			break
+		}
+
+		return e.complexity.Activity.ID(childComplexity), true
+	case "Activity.itineraryDayId":
+		if e.complexity.Activity.ItineraryDayID == nil {
+			break
+		}
+
+		return e.complexity.Activity.ItineraryDayID(childComplexity), true
+	case "Activity.location":
+		if e.complexity.Activity.Location == nil {
+			break
+		}
+
+		return e.complexity.Activity.Location(childComplexity), true
+	case "Activity.notes":
+		if e.complexity.Activity.Notes == nil {
+			break
+		}
+
+		return e.complexity.Activity.Notes(childComplexity), true
+	case "Activity.placeId":
+		if e.complexity.Activity.PlaceID == nil {
+			break
+		}
+
+		return e.complexity.Activity.PlaceID(childComplexity), true
+	case "Activity.time":
+		if e.complexity.Activity.Time == nil {
+			break
+		}
+
+		return e.complexity.Activity.Time(childComplexity), true
+	case "Activity.title":
+		if e.complexity.Activity.Title == nil {
+			break
+		}
+
+		return e.complexity.Activity.Title(childComplexity), true
+	case "Activity.type":
+		if e.complexity.Activity.Type == nil {
+			break
+		}
+
+		return e.complexity.Activity.Type(childComplexity), true
+
+	case "ItineraryDay.activities":
+		if e.complexity.ItineraryDay.Activities == nil {
+			break
+		}
+
+		return e.complexity.ItineraryDay.Activities(childComplexity), true
+	case "ItineraryDay.date":
+		if e.complexity.ItineraryDay.Date == nil {
+			break
+		}
+
+		return e.complexity.ItineraryDay.Date(childComplexity), true
+	case "ItineraryDay.dayNumber":
+		if e.complexity.ItineraryDay.DayNumber == nil {
+			break
+		}
+
+		return e.complexity.ItineraryDay.DayNumber(childComplexity), true
+	case "ItineraryDay.id":
+		if e.complexity.ItineraryDay.ID == nil {
+			break
+		}
+
+		return e.complexity.ItineraryDay.ID(childComplexity), true
+	case "ItineraryDay.tripId":
+		if e.complexity.ItineraryDay.TripID == nil {
+			break
+		}
+
+		return e.complexity.ItineraryDay.TripID(childComplexity), true
+
 	case "Mutation.createUser":
 		if e.complexity.Mutation.CreateUser == nil {
 			break
@@ -117,12 +278,34 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateUser(childComplexity, args["input"].(model.CreateUserInput)), true
 
+	case "Query.activity":
+		if e.complexity.Query.Activity == nil {
+			break
+		}
+
+		args, err := ec.field_Query_activity_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Activity(childComplexity, args["id"].(string)), true
 	case "Query.currentUser":
 		if e.complexity.Query.CurrentUser == nil {
 			break
 		}
 
 		return e.complexity.Query.CurrentUser(childComplexity), true
+	case "Query.trip":
+		if e.complexity.Query.Trip == nil {
+			break
+		}
+
+		args, err := ec.field_Query_trip_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Trip(childComplexity, args["id"].(string)), true
 	case "Query.tripSuggestion":
 		if e.complexity.Query.TripSuggestion == nil {
 			break
@@ -134,6 +317,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Query.TripSuggestion(childComplexity, args["prompt"].(string)), true
+	case "Query.trips":
+		if e.complexity.Query.Trips == nil {
+			break
+		}
+
+		return e.complexity.Query.Trips(childComplexity), true
 	case "Query.user":
 		if e.complexity.Query.User == nil {
 			break
@@ -152,12 +341,73 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Query.Users(childComplexity), true
 
+	case "Trip.collaborators":
+		if e.complexity.Trip.Collaborators == nil {
+			break
+		}
+
+		return e.complexity.Trip.Collaborators(childComplexity), true
+	case "Trip.destination":
+		if e.complexity.Trip.Destination == nil {
+			break
+		}
+
+		return e.complexity.Trip.Destination(childComplexity), true
+	case "Trip.endDate":
+		if e.complexity.Trip.EndDate == nil {
+			break
+		}
+
+		return e.complexity.Trip.EndDate(childComplexity), true
 	case "Trip.id":
 		if e.complexity.Trip.ID == nil {
 			break
 		}
 
 		return e.complexity.Trip.ID(childComplexity), true
+	case "Trip.itinerary":
+		if e.complexity.Trip.Itinerary == nil {
+			break
+		}
+
+		return e.complexity.Trip.Itinerary(childComplexity), true
+	case "Trip.ownerId":
+		if e.complexity.Trip.OwnerID == nil {
+			break
+		}
+
+		return e.complexity.Trip.OwnerID(childComplexity), true
+	case "Trip.startDate":
+		if e.complexity.Trip.StartDate == nil {
+			break
+		}
+
+		return e.complexity.Trip.StartDate(childComplexity), true
+	case "Trip.title":
+		if e.complexity.Trip.Title == nil {
+			break
+		}
+
+		return e.complexity.Trip.Title(childComplexity), true
+	case "Trip.travelers":
+		if e.complexity.Trip.Travelers == nil {
+			break
+		}
+
+		return e.complexity.Trip.Travelers(childComplexity), true
+
+	case "TripCollaborator.tripId":
+		if e.complexity.TripCollaborator.TripID == nil {
+			break
+		}
+
+		return e.complexity.TripCollaborator.TripID(childComplexity), true
+	case "TripCollaborator.userId":
+		if e.complexity.TripCollaborator.UserID == nil {
+			break
+		}
+
+		return e.complexity.TripCollaborator.UserID(childComplexity), true
 
 	case "User.email":
 		if e.complexity.User.Email == nil {
@@ -331,6 +581,17 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_activity_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_tripSuggestion_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -339,6 +600,17 @@ func (ec *executionContext) field_Query_tripSuggestion_args(ctx context.Context,
 		return nil, err
 	}
 	args["prompt"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_trip_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "id", ec.unmarshalNID2string)
+	if err != nil {
+		return nil, err
+	}
+	args["id"] = arg0
 	return args, nil
 }
 
@@ -404,6 +676,463 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Activity_id(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_id,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Activity().ID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_itineraryDayId(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_itineraryDayId,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Activity().ItineraryDayID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_itineraryDayId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_placeId(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_placeId,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Activity().PlaceID(ctx, obj)
+		},
+		nil,
+		ec.marshalOID2ᚖstring,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_placeId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_type(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_type,
+		func(ctx context.Context) (any, error) {
+			return obj.Type, nil
+		},
+		nil,
+		ec.marshalNActivityType2eztripᚋapiᚑgoᚋtripᚐActivityType,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ActivityType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_time(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_time,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Activity().Time(ctx, obj)
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_time(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_title(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_title,
+		func(ctx context.Context) (any, error) {
+			return obj.Title, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_location(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_location,
+		func(ctx context.Context) (any, error) {
+			return obj.Location, nil
+		},
+		nil,
+		ec.marshalOString2string,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_location(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_category(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_category,
+		func(ctx context.Context) (any, error) {
+			return obj.Category, nil
+		},
+		nil,
+		ec.marshalNActivityCategory2eztripᚋapiᚑgoᚋtripᚐActivityCategory,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_category(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ActivityCategory does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_description(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_description,
+		func(ctx context.Context) (any, error) {
+			return obj.Description, nil
+		},
+		nil,
+		ec.marshalOString2string,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_description(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Activity_notes(ctx context.Context, field graphql.CollectedField, obj *trip.Activity) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Activity_notes,
+		func(ctx context.Context) (any, error) {
+			return obj.Notes, nil
+		},
+		nil,
+		ec.marshalOString2string,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Activity_notes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Activity",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ItineraryDay_id(ctx context.Context, field graphql.CollectedField, obj *trip.ItineraryDay) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ItineraryDay_id,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.ItineraryDay().ID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ItineraryDay_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ItineraryDay",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ItineraryDay_tripId(ctx context.Context, field graphql.CollectedField, obj *trip.ItineraryDay) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ItineraryDay_tripId,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.ItineraryDay().TripID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ItineraryDay_tripId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ItineraryDay",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ItineraryDay_date(ctx context.Context, field graphql.CollectedField, obj *trip.ItineraryDay) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ItineraryDay_date,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.ItineraryDay().Date(ctx, obj)
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ItineraryDay_date(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ItineraryDay",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ItineraryDay_dayNumber(ctx context.Context, field graphql.CollectedField, obj *trip.ItineraryDay) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ItineraryDay_dayNumber,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.ItineraryDay().DayNumber(ctx, obj)
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ItineraryDay_dayNumber(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ItineraryDay",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ItineraryDay_activities(ctx context.Context, field graphql.CollectedField, obj *trip.ItineraryDay) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_ItineraryDay_activities,
+		func(ctx context.Context) (any, error) {
+			return obj.Activities, nil
+		},
+		nil,
+		ec.marshalNActivity2ᚕeztripᚋapiᚑgoᚋtripᚐActivityᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_ItineraryDay_activities(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ItineraryDay",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "itineraryDayId":
+				return ec.fieldContext_Activity_itineraryDayId(ctx, field)
+			case "placeId":
+				return ec.fieldContext_Activity_placeId(ctx, field)
+			case "type":
+				return ec.fieldContext_Activity_type(ctx, field)
+			case "time":
+				return ec.fieldContext_Activity_time(ctx, field)
+			case "title":
+				return ec.fieldContext_Activity_title(ctx, field)
+			case "location":
+				return ec.fieldContext_Activity_location(ctx, field)
+			case "category":
+				return ec.fieldContext_Activity_category(ctx, field)
+			case "description":
+				return ec.fieldContext_Activity_description(ctx, field)
+			case "notes":
+				return ec.fieldContext_Activity_notes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	return fc, nil
+}
 
 func (ec *executionContext) _Mutation_createUser(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -579,6 +1308,179 @@ func (ec *executionContext) fieldContext_Query_user(ctx context.Context, field g
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_user_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_trips(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_trips,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Query().Trips(ctx)
+		},
+		nil,
+		ec.marshalNTrip2ᚕᚖeztripᚋapiᚑgoᚋtripᚐTripᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_trips(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Trip_id(ctx, field)
+			case "ownerId":
+				return ec.fieldContext_Trip_ownerId(ctx, field)
+			case "title":
+				return ec.fieldContext_Trip_title(ctx, field)
+			case "destination":
+				return ec.fieldContext_Trip_destination(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Trip_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Trip_endDate(ctx, field)
+			case "travelers":
+				return ec.fieldContext_Trip_travelers(ctx, field)
+			case "itinerary":
+				return ec.fieldContext_Trip_itinerary(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Trip_collaborators(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Trip", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_trip(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_trip,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Trip(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalOTrip2ᚖeztripᚋapiᚑgoᚋtripᚐTrip,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_trip(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Trip_id(ctx, field)
+			case "ownerId":
+				return ec.fieldContext_Trip_ownerId(ctx, field)
+			case "title":
+				return ec.fieldContext_Trip_title(ctx, field)
+			case "destination":
+				return ec.fieldContext_Trip_destination(ctx, field)
+			case "startDate":
+				return ec.fieldContext_Trip_startDate(ctx, field)
+			case "endDate":
+				return ec.fieldContext_Trip_endDate(ctx, field)
+			case "travelers":
+				return ec.fieldContext_Trip_travelers(ctx, field)
+			case "itinerary":
+				return ec.fieldContext_Trip_itinerary(ctx, field)
+			case "collaborators":
+				return ec.fieldContext_Trip_collaborators(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Trip", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_trip_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_activity(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Query_activity,
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.resolvers.Query().Activity(ctx, fc.Args["id"].(string))
+		},
+		nil,
+		ec.marshalOActivity2ᚖeztripᚋapiᚑgoᚋtripᚐActivity,
+		true,
+		false,
+	)
+}
+
+func (ec *executionContext) fieldContext_Query_activity(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Activity_id(ctx, field)
+			case "itineraryDayId":
+				return ec.fieldContext_Activity_itineraryDayId(ctx, field)
+			case "placeId":
+				return ec.fieldContext_Activity_placeId(ctx, field)
+			case "type":
+				return ec.fieldContext_Activity_type(ctx, field)
+			case "time":
+				return ec.fieldContext_Activity_time(ctx, field)
+			case "title":
+				return ec.fieldContext_Activity_title(ctx, field)
+			case "location":
+				return ec.fieldContext_Activity_location(ctx, field)
+			case "category":
+				return ec.fieldContext_Activity_category(ctx, field)
+			case "description":
+				return ec.fieldContext_Activity_description(ctx, field)
+			case "notes":
+				return ec.fieldContext_Activity_notes(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Activity", field.Name)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_activity_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -763,6 +1665,314 @@ func (ec *executionContext) fieldContext_Trip_id(_ context.Context, field graphq
 	return fc, nil
 }
 
+func (ec *executionContext) _Trip_ownerId(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_ownerId,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Trip().OwnerID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_ownerId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_title(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_title,
+		func(ctx context.Context) (any, error) {
+			return obj.Title, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_title(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_destination(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_destination,
+		func(ctx context.Context) (any, error) {
+			return obj.Destination, nil
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_destination(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_startDate(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_startDate,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Trip().StartDate(ctx, obj)
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_startDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_endDate(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_endDate,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Trip().EndDate(ctx, obj)
+		},
+		nil,
+		ec.marshalNString2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_endDate(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_travelers(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_travelers,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.Trip().Travelers(ctx, obj)
+		},
+		nil,
+		ec.marshalNInt2int32,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_travelers(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_itinerary(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_itinerary,
+		func(ctx context.Context) (any, error) {
+			return obj.Itinerary, nil
+		},
+		nil,
+		ec.marshalNItineraryDay2ᚕeztripᚋapiᚑgoᚋtripᚐItineraryDayᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_itinerary(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_ItineraryDay_id(ctx, field)
+			case "tripId":
+				return ec.fieldContext_ItineraryDay_tripId(ctx, field)
+			case "date":
+				return ec.fieldContext_ItineraryDay_date(ctx, field)
+			case "dayNumber":
+				return ec.fieldContext_ItineraryDay_dayNumber(ctx, field)
+			case "activities":
+				return ec.fieldContext_ItineraryDay_activities(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type ItineraryDay", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Trip_collaborators(ctx context.Context, field graphql.CollectedField, obj *trip.Trip) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_Trip_collaborators,
+		func(ctx context.Context) (any, error) {
+			return obj.Collaborators, nil
+		},
+		nil,
+		ec.marshalNTripCollaborator2ᚕeztripᚋapiᚑgoᚋtripᚐTripCollaboratorᚄ,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_Trip_collaborators(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Trip",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "tripId":
+				return ec.fieldContext_TripCollaborator_tripId(ctx, field)
+			case "userId":
+				return ec.fieldContext_TripCollaborator_userId(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type TripCollaborator", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TripCollaborator_tripId(ctx context.Context, field graphql.CollectedField, obj *trip.TripCollaborator) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TripCollaborator_tripId,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.TripCollaborator().TripID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TripCollaborator_tripId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TripCollaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _TripCollaborator_userId(ctx context.Context, field graphql.CollectedField, obj *trip.TripCollaborator) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		ec.fieldContext_TripCollaborator_userId,
+		func(ctx context.Context) (any, error) {
+			return ec.resolvers.TripCollaborator().UserID(ctx, obj)
+		},
+		nil,
+		ec.marshalNID2string,
+		true,
+		true,
+	)
+}
+
+func (ec *executionContext) fieldContext_TripCollaborator_userId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "TripCollaborator",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _User_id(ctx context.Context, field graphql.CollectedField, obj *user.User) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -770,7 +1980,7 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 		field,
 		ec.fieldContext_User_id,
 		func(ctx context.Context) (any, error) {
-			return obj.ID, nil
+			return ec.resolvers.User().ID(ctx, obj)
 		},
 		nil,
 		ec.marshalNID2string,
@@ -783,8 +1993,8 @@ func (ec *executionContext) fieldContext_User_id(_ context.Context, field graphq
 	fc = &graphql.FieldContext{
 		Object:     "User",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type ID does not have child fields")
 		},
@@ -2381,6 +3591,385 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 
 // region    **************************** object.gotpl ****************************
 
+var activityImplementors = []string{"Activity"}
+
+func (ec *executionContext) _Activity(ctx context.Context, sel ast.SelectionSet, obj *trip.Activity) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, activityImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Activity")
+		case "id":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Activity_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "itineraryDayId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Activity_itineraryDayId(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "placeId":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Activity_placeId(ctx, field, obj)
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "type":
+			out.Values[i] = ec._Activity_type(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "time":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Activity_time(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "title":
+			out.Values[i] = ec._Activity_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "location":
+			out.Values[i] = ec._Activity_location(ctx, field, obj)
+		case "category":
+			out.Values[i] = ec._Activity_category(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "description":
+			out.Values[i] = ec._Activity_description(ctx, field, obj)
+		case "notes":
+			out.Values[i] = ec._Activity_notes(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var itineraryDayImplementors = []string{"ItineraryDay"}
+
+func (ec *executionContext) _ItineraryDay(ctx context.Context, sel ast.SelectionSet, obj *trip.ItineraryDay) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, itineraryDayImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ItineraryDay")
+		case "id":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ItineraryDay_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "tripId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ItineraryDay_tripId(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "date":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ItineraryDay_date(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "dayNumber":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._ItineraryDay_dayNumber(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "activities":
+			out.Values[i] = ec._ItineraryDay_activities(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var mutationImplementors = []string{"Mutation"}
 
 func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet) graphql.Marshaler {
@@ -2509,6 +4098,66 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trips":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trips(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "trip":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_trip(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "activity":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_activity(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
 		case "tripSuggestion":
 			field := field
 
@@ -2609,6 +4258,276 @@ func (ec *executionContext) _Trip(ctx context.Context, sel ast.SelectionSet, obj
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "ownerId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Trip_ownerId(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "title":
+			out.Values[i] = ec._Trip_title(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "destination":
+			out.Values[i] = ec._Trip_destination(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "startDate":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Trip_startDate(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "endDate":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Trip_endDate(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "travelers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Trip_travelers(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "itinerary":
+			out.Values[i] = ec._Trip_itinerary(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "collaborators":
+			out.Values[i] = ec._Trip_collaborators(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.deferred, int32(len(deferred)))
+
+	for label, dfs := range deferred {
+		ec.processDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var tripCollaboratorImplementors = []string{"TripCollaborator"}
+
+func (ec *executionContext) _TripCollaborator(ctx context.Context, sel ast.SelectionSet, obj *trip.TripCollaborator) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tripCollaboratorImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TripCollaborator")
+		case "tripId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TripCollaborator_tripId(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "userId":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._TripCollaborator_userId(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -2644,24 +4563,55 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "__typename":
 			out.Values[i] = graphql.MarshalString("User")
 		case "id":
-			out.Values[i] = ec._User_id(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_id(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "firstName":
 			out.Values[i] = ec._User_firstName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "lastName":
 			out.Values[i] = ec._User_lastName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
@@ -3021,6 +4971,88 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNActivity2eztripᚋapiᚑgoᚋtripᚐActivity(ctx context.Context, sel ast.SelectionSet, v trip.Activity) graphql.Marshaler {
+	return ec._Activity(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNActivity2ᚕeztripᚋapiᚑgoᚋtripᚐActivityᚄ(ctx context.Context, sel ast.SelectionSet, v []trip.Activity) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNActivity2eztripᚋapiᚑgoᚋtripᚐActivity(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalNActivityCategory2eztripᚋapiᚑgoᚋtripᚐActivityCategory(ctx context.Context, v any) (trip.ActivityCategory, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := trip.ActivityCategory(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNActivityCategory2eztripᚋapiᚑgoᚋtripᚐActivityCategory(ctx context.Context, sel ast.SelectionSet, v trip.ActivityCategory) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) unmarshalNActivityType2eztripᚋapiᚑgoᚋtripᚐActivityType(ctx context.Context, v any) (trip.ActivityType, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := trip.ActivityType(tmp)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNActivityType2eztripᚋapiᚑgoᚋtripᚐActivityType(ctx context.Context, sel ast.SelectionSet, v trip.ActivityType) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3058,6 +5090,70 @@ func (ec *executionContext) marshalNID2string(ctx context.Context, sel ast.Selec
 	return res
 }
 
+func (ec *executionContext) unmarshalNInt2int32(ctx context.Context, v any) (int32, error) {
+	res, err := graphql.UnmarshalInt32(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNInt2int32(ctx context.Context, sel ast.SelectionSet, v int32) graphql.Marshaler {
+	_ = sel
+	res := graphql.MarshalInt32(v)
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+	}
+	return res
+}
+
+func (ec *executionContext) marshalNItineraryDay2eztripᚋapiᚑgoᚋtripᚐItineraryDay(ctx context.Context, sel ast.SelectionSet, v trip.ItineraryDay) graphql.Marshaler {
+	return ec._ItineraryDay(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNItineraryDay2ᚕeztripᚋapiᚑgoᚋtripᚐItineraryDayᚄ(ctx context.Context, sel ast.SelectionSet, v []trip.ItineraryDay) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNItineraryDay2eztripᚋapiᚑgoᚋtripᚐItineraryDay(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3072,6 +5168,108 @@ func (ec *executionContext) marshalNString2string(ctx context.Context, sel ast.S
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNTrip2ᚕᚖeztripᚋapiᚑgoᚋtripᚐTripᚄ(ctx context.Context, sel ast.SelectionSet, v []*trip.Trip) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTrip2ᚖeztripᚋapiᚑgoᚋtripᚐTrip(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNTrip2ᚖeztripᚋapiᚑgoᚋtripᚐTrip(ctx context.Context, sel ast.SelectionSet, v *trip.Trip) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Trip(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTripCollaborator2eztripᚋapiᚑgoᚋtripᚐTripCollaborator(ctx context.Context, sel ast.SelectionSet, v trip.TripCollaborator) graphql.Marshaler {
+	return ec._TripCollaborator(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTripCollaborator2ᚕeztripᚋapiᚑgoᚋtripᚐTripCollaboratorᚄ(ctx context.Context, sel ast.SelectionSet, v []trip.TripCollaborator) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTripCollaborator2eztripᚋapiᚑgoᚋtripᚐTripCollaborator(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNUser2eztripᚋapiᚑgoᚋuserᚐUser(ctx context.Context, sel ast.SelectionSet, v user.User) graphql.Marshaler {
@@ -3385,6 +5583,13 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
+func (ec *executionContext) marshalOActivity2ᚖeztripᚋapiᚑgoᚋtripᚐActivity(ctx context.Context, sel ast.SelectionSet, v *trip.Activity) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Activity(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3415,6 +5620,36 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
+func (ec *executionContext) unmarshalOID2ᚖstring(ctx context.Context, v any) (*string, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := graphql.UnmarshalID(v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOID2ᚖstring(ctx context.Context, sel ast.SelectionSet, v *string) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalID(*v)
+	return res
+}
+
+func (ec *executionContext) unmarshalOString2string(ctx context.Context, v any) (string, error) {
+	res, err := graphql.UnmarshalString(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOString2string(ctx context.Context, sel ast.SelectionSet, v string) graphql.Marshaler {
+	_ = sel
+	_ = ctx
+	res := graphql.MarshalString(v)
+	return res
+}
+
 func (ec *executionContext) unmarshalOString2ᚖstring(ctx context.Context, v any) (*string, error) {
 	if v == nil {
 		return nil, nil
@@ -3431,6 +5666,13 @@ func (ec *executionContext) marshalOString2ᚖstring(ctx context.Context, sel as
 	_ = ctx
 	res := graphql.MarshalString(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOTrip2ᚖeztripᚋapiᚑgoᚋtripᚐTrip(ctx context.Context, sel ast.SelectionSet, v *trip.Trip) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Trip(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalOUser2ᚖeztripᚋapiᚑgoᚋuserᚐUser(ctx context.Context, sel ast.SelectionSet, v *user.User) graphql.Marshaler {

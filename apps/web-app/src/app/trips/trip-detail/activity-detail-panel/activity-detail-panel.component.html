@@ -19,10 +19,10 @@
     </div>
 
     <div class="activity-panel__content">
-      @if (activity().images.length > 0) {
+      @if (activity().images && activity().images!.length > 0) {
         <div class="activity-panel__hero">
           <img
-            [src]="activity().images[0]"
+            [src]="activity().images![0]"
             [alt]="activity().title"
             class="activity-panel__hero-image"
           />
@@ -47,46 +47,54 @@
           }}</span>
         </div>
 
-        <div class="activity-panel__meta">
-          <div class="activity-panel__rating-inline">
-            <mat-icon class="activity-panel__star-icon">star</mat-icon>
-            <span class="activity-panel__rating-value">{{
-              activity().rating
-            }}</span>
-            <span class="activity-panel__review-text"
-              >({{ activity().reviewCount }})</span
-            >
+        @if (activity().rating) {
+          <div class="activity-panel__meta">
+            <div class="activity-panel__rating-inline">
+              <mat-icon class="activity-panel__star-icon">star</mat-icon>
+              <span class="activity-panel__rating-value">{{
+                activity().rating
+              }}</span>
+              <span class="activity-panel__review-text"
+                >({{ activity().reviewCount }})</span
+              >
+            </div>
           </div>
+        }
+
+        @if (activity().address) {
+          <a
+            [href]="
+              'https://www.google.com/maps/search/?api=1&query=' +
+              encodeURIComponent(activity().address!)
+            "
+            target="_blank"
+            rel="noopener noreferrer"
+            class="activity-panel__location-info"
+          >
+            <mat-icon>location_on</mat-icon>
+            <span>{{ activity().location }}</span>
+          </a>
+        }
+
+        @if (activity().website) {
+          <a
+            [href]="activity().website"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="activity-panel__website-link"
+          >
+            <mat-icon>open_in_new</mat-icon>
+            <span>Visit Website</span>
+          </a>
+        }
+      </div>
+
+      @if (activity().notes) {
+        <div class="activity-panel__section">
+          <h3 class="activity-panel__section-title">Notes</h3>
+          <p class="activity-panel__text">{{ activity().notes }}</p>
         </div>
-
-        <a
-          [href]="
-            'https://www.google.com/maps/search/?api=1&query=' +
-            encodeURIComponent(activity().address)
-          "
-          target="_blank"
-          rel="noopener noreferrer"
-          class="activity-panel__location-info"
-        >
-          <mat-icon>location_on</mat-icon>
-          <span>{{ activity().location }}</span>
-        </a>
-
-        <a
-          [href]="activity().website"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="activity-panel__website-link"
-        >
-          <mat-icon>open_in_new</mat-icon>
-          <span>Visit Website</span>
-        </a>
-      </div>
-
-      <div class="activity-panel__section">
-        <h3 class="activity-panel__section-title">Notes</h3>
-        <p class="activity-panel__text">{{ activity().notes }}</p>
-      </div>
+      }
     </div>
   </aside>
 </div>

@@ -48,6 +48,19 @@ Thumbs.db
 .env.local
 .env.production
 .env.development
+
+# OpenTofu / Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+.terraform/
+.tofu/
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
 *.env
 
 # Docker

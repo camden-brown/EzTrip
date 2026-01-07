@@ -4,6 +4,11 @@ import (
 	"context"
 	"time"
 
+	appErrors "eztrip/api-go/errors"
+	"eztrip/api-go/logger"
+
+	"github.com/google/uuid"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -23,6 +28,29 @@ func GetUserAuth0ID(ctx context.Context) string {
 	return ""
 }
 
+// GetAuthenticatedUser retrieves the authenticated user from the database and returns both the user and their UUID.
+// This is a common utility function for services that need to verify user authentication.
+func GetAuthenticatedUser(ctx context.Context, db *gorm.DB) (*User, uuid.UUID, error) {
+	auth0ID := GetUserAuth0ID(ctx)
+	if auth0ID == "" {
+		return nil, uuid.Nil, appErrors.Unauthorized("User not authenticated")
+	}
+
+	var currentUser User
+	if err := db.WithContext(ctx).Where("auth0_user_id = ?", auth0ID).First(&currentUser).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, uuid.Nil, appErrors.NotFound("User")
+		}
+		logger.Log.WithFields(logrus.Fields{
+			"auth0_id": auth0ID,
+			"error":    err.Error(),
+		}).Error("Failed to fetch user by Auth0 ID")
+		return nil, uuid.Nil, appErrors.Internal("Failed to fetch user")
+	}
+
+	return &currentUser, currentUser.ID, nil
+}
+
 type CreateUserInput struct {
 	FirstName string `json:"firstName" validate:"required,min=1,max=100"`
 	LastName  string `json:"lastName" validate:"required,min=1,max=100"`
@@ -36,7 +64,7 @@ type UpdateUserInput struct {
 }
 
 type User struct {
-	ID          string         `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
+	ID          uuid.UUID      `json:"id" gorm:"type:uuid;primaryKey;default:gen_random_uuid()"`
 	Auth0UserID *string        `json:"-" gorm:"column:auth0_user_id;uniqueIndex"` // Internal only - not exposed to client
 	FirstName   string         `json:"firstName" gorm:"column:first_name;not null"`
 	LastName    string         `json:"lastName" gorm:"column:last_name;not null"`

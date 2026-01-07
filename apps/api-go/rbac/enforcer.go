@@ -12,6 +12,7 @@ import (
 
 	"github.com/casbin/casbin/v2"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
+	"github.com/google/uuid"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
@@ -258,20 +259,20 @@ func GetUsersForRole(enforcer *casbin.Enforcer, role string) ([]string, error) {
 }
 
 // RequireAdminRole checks if the user has the admin role
-func RequireAdminRole(ctx context.Context, userUUID string) error {
+func RequireAdminRole(ctx context.Context, userUUID uuid.UUID) error {
 	enforcer, err := GetEnforcerFromContext(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to get RBAC enforcer: %w", err)
 	}
 
-	hasRole, err := HasRole(enforcer, userUUID, "admin")
+	hasRole, err := HasRole(enforcer, userUUID.String(), "admin")
 	if err != nil {
 		return fmt.Errorf("failed to check user role: %w", err)
 	}
 
 	if !hasRole {
 		logger.Log.WithFields(logrus.Fields{
-			"user_id": userUUID,
+			"user_id": userUUID.String(),
 			"role":    "admin",
 		}).Warn("Unauthorized admin access attempt")
 		return appErrors.Forbidden("You do not have permission to perform this action")

@@ -8,6 +8,8 @@ export type ActivityCategory =
   | 'shopping'
   | 'entertainment';
 
+export type ActivityType = 'place_based' | 'custom' | 'transport';
+
 export enum CategoryIcon {
   Beach = 'beach_access',
   Hike = 'terrain',
@@ -38,17 +40,22 @@ export interface Activity {
   title: string;
   location: string;
   category: ActivityCategory;
+  type: ActivityType;
   description: string;
-  images: string[];
-  rating: number;
-  reviewCount: number;
-  address: string;
-  website: string;
   notes: string;
+  placeId?: string | null;
+  // Optional fields from Google Places (not yet populated)
+  images?: string[];
+  rating?: number;
+  reviewCount?: number;
+  address?: string;
+  website?: string;
 }
 
 export interface ItineraryDay {
+  id: string;
   date: string;
+  dayNumber: number;
   activities: Activity[];
 }
 

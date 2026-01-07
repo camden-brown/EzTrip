@@ -22,10 +22,9 @@ func RunSeeds(db *gorm.DB) error {
 		return err
 	}
 
-	// Add more seed functions here as needed:
-	// if err := SeedPosts(db); err != nil {
-	//     return err
-	// }
+	if err := SeedTrips(db); err != nil {
+		return err
+	}
 
 	logger.Log.Info("All seeds completed successfully")
 	return nil

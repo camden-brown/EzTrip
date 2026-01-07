@@ -2,17 +2,40 @@
   <h1>My Trips</h1>
   <p>View and manage your trips.</p>
 
-  <div class="trips-list">
-    <a routerLink="/trips/1" class="trip-card">
-      <div class="trip-card-content">
-        <h3>Kauai Family Adventure</h3>
-        <div class="trip-card-meta">
-          <span><mat-icon>location_on</mat-icon> Kauai, Hawaii</span>
-          <span><mat-icon>calendar_today</mat-icon> Jan 10 - 16, 2026</span>
-          <span><mat-icon>group</mat-icon> 4 travelers</span>
-        </div>
-      </div>
-      <mat-icon class="arrow-icon">chevron_right</mat-icon>
-    </a>
-  </div>
+  @if (tripService.isLoadingTrips()) {
+    <div class="loading-state">
+      <p>Loading trips...</p>
+    </div>
+  } @else if (tripService.tripsError()) {
+    <div class="error-state">
+      <p>{{ tripService.tripsError() }}</p>
+    </div>
+  } @else if (tripService.trips().length === 0) {
+    <div class="empty-state">
+      <p>You don't have any trips yet. Start planning your next adventure!</p>
+    </div>
+  } @else {
+    <div class="trips-list">
+      @for (trip of tripService.trips(); track trip.id) {
+        <a [routerLink]="'/trips/' + trip.id" class="trip-card">
+          <div class="trip-card-content">
+            <h3>{{ trip.title }}</h3>
+            <div class="trip-card-meta">
+              <span
+                ><mat-icon>location_on</mat-icon> {{ trip.destination }}</span
+              >
+              <span
+                ><mat-icon>calendar_today</mat-icon> {{ trip.startDate }} -
+                {{ trip.endDate }}</span
+              >
+              <span
+                ><mat-icon>group</mat-icon> {{ trip.travelers }} travelers</span
+              >
+            </div>
+          </div>
+          <mat-icon class="arrow-icon">chevron_right</mat-icon>
+        </a>
+      }
+    </div>
+  }
 </div>

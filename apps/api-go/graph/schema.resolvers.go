@@ -13,6 +13,50 @@ import (
 	"fmt"
 )
 
+// ID is the resolver for the id field.
+func (r *activityResolver) ID(ctx context.Context, obj *trip.Activity) (string, error) {
+	return obj.ID.String(), nil
+}
+
+// ItineraryDayID is the resolver for the itineraryDayId field.
+func (r *activityResolver) ItineraryDayID(ctx context.Context, obj *trip.Activity) (string, error) {
+	return obj.ItineraryDayID.String(), nil
+}
+
+// PlaceID is the resolver for the placeId field.
+func (r *activityResolver) PlaceID(ctx context.Context, obj *trip.Activity) (*string, error) {
+	if obj.PlaceID == nil {
+		return nil, nil
+	}
+	placeIDStr := obj.PlaceID.String()
+	return &placeIDStr, nil
+}
+
+// Time is the resolver for the time field.
+func (r *activityResolver) Time(ctx context.Context, obj *trip.Activity) (string, error) {
+	return obj.Time.Format("2006-01-02T15:04:05Z07:00"), nil
+}
+
+// ID is the resolver for the id field.
+func (r *itineraryDayResolver) ID(ctx context.Context, obj *trip.ItineraryDay) (string, error) {
+	return obj.ID.String(), nil
+}
+
+// TripID is the resolver for the tripId field.
+func (r *itineraryDayResolver) TripID(ctx context.Context, obj *trip.ItineraryDay) (string, error) {
+	return obj.TripID.String(), nil
+}
+
+// Date is the resolver for the date field.
+func (r *itineraryDayResolver) Date(ctx context.Context, obj *trip.ItineraryDay) (string, error) {
+	return obj.Date.Format("2006-01-02"), nil
+}
+
+// DayNumber is the resolver for the dayNumber field.
+func (r *itineraryDayResolver) DayNumber(ctx context.Context, obj *trip.ItineraryDay) (int32, error) {
+	return int32(obj.DayNumber), nil
+}
+
 // CreateUser is the resolver for the createUser field.
 func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*user.User, error) {
 	panic(fmt.Errorf("not implemented: CreateUser - createUser"))
@@ -33,6 +77,29 @@ func (r *queryResolver) User(ctx context.Context, id string) (*user.User, error)
 	return r.UserResolver.User(ctx, id)
 }
 
+// Trips is the resolver for the trips field.
+func (r *queryResolver) Trips(ctx context.Context) ([]*trip.Trip, error) {
+	trips, err := r.TripResolver.Trips(ctx)
+	if err != nil {
+		return nil, err
+	}
+	result := make([]*trip.Trip, len(trips))
+	for i := range trips {
+		result[i] = &trips[i]
+	}
+	return result, nil
+}
+
+// Trip is the resolver for the trip field.
+func (r *queryResolver) Trip(ctx context.Context, id string) (*trip.Trip, error) {
+	return r.TripResolver.Trip(ctx, id)
+}
+
+// Activity is the resolver for the activity field.
+func (r *queryResolver) Activity(ctx context.Context, id string) (*trip.Activity, error) {
+	return r.TripResolver.Activity(ctx, id)
+}
+
 // TripSuggestion is the resolver for the tripSuggestion field.
 func (r *queryResolver) TripSuggestion(ctx context.Context, prompt string) (string, error) {
 	return r.TripResolver.TripSuggestion(ctx, prompt)
@@ -43,6 +110,47 @@ func (r *tripResolver) ID(ctx context.Context, obj *trip.Trip) (string, error) {
 	return obj.ID.String(), nil
 }
 
+// OwnerID is the resolver for the ownerId field.
+func (r *tripResolver) OwnerID(ctx context.Context, obj *trip.Trip) (string, error) {
+	return obj.OwnerID.String(), nil
+}
+
+// StartDate is the resolver for the startDate field.
+func (r *tripResolver) StartDate(ctx context.Context, obj *trip.Trip) (string, error) {
+	return obj.StartDate.Format("2006-01-02"), nil
+}
+
+// EndDate is the resolver for the endDate field.
+func (r *tripResolver) EndDate(ctx context.Context, obj *trip.Trip) (string, error) {
+	return obj.EndDate.Format("2006-01-02"), nil
+}
+
+// Travelers is the resolver for the travelers field.
+func (r *tripResolver) Travelers(ctx context.Context, obj *trip.Trip) (int32, error) {
+	return int32(obj.Travelers), nil
+}
+
+// TripID is the resolver for the tripId field.
+func (r *tripCollaboratorResolver) TripID(ctx context.Context, obj *trip.TripCollaborator) (string, error) {
+	return obj.TripID.String(), nil
+}
+
+// UserID is the resolver for the userId field.
+func (r *tripCollaboratorResolver) UserID(ctx context.Context, obj *trip.TripCollaborator) (string, error) {
+	return obj.UserID.String(), nil
+}
+
+// ID is the resolver for the id field.
+func (r *userResolver) ID(ctx context.Context, obj *user.User) (string, error) {
+	return obj.ID.String(), nil
+}
+
+// Activity returns ActivityResolver implementation.
+func (r *Resolver) Activity() ActivityResolver { return &activityResolver{r} }
+
+// ItineraryDay returns ItineraryDayResolver implementation.
+func (r *Resolver) ItineraryDay() ItineraryDayResolver { return &itineraryDayResolver{r} }
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
 
@@ -52,6 +160,16 @@ func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 // Trip returns TripResolver implementation.
 func (r *Resolver) Trip() TripResolver { return &tripResolver{r} }
 
+// TripCollaborator returns TripCollaboratorResolver implementation.
+func (r *Resolver) TripCollaborator() TripCollaboratorResolver { return &tripCollaboratorResolver{r} }
+
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
+type activityResolver struct{ *Resolver }
+type itineraryDayResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type tripResolver struct{ *Resolver }
+type tripCollaboratorResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

@@ -1,4 +1,4 @@
-@if (trip(); as tripData) {
+@if (tripService.currentTrip(); as tripData) {
   <div class="trip-detail-container">
     <header class="trip-header">
       <button mat-icon-button class="back-btn" (click)="goBack()">
