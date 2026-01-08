@@ -1,0 +1,34 @@
+# Cloudflare Configuration
+# Copy this file to terraform.tfvars and fill in your values
+# NEVER commit terraform.tfvars to git (it's in .gitignore)
+
+# Your Cloudflare account ID (found in dashboard URL or account settings)
+cloudflare_account_id = ""
+
+# Your domain name
+domain = "ez-trip.ai"
+
+# Optional: API server IP (leave empty if not deployed yet)
+api_server_ip = ""
+
+# Enable Cloudflare proxy (recommended for production)
+enable_proxy = true
+
+# =============================================================================
+# Cloudflare Pages Configuration
+# =============================================================================
+
+# Cloudflare Pages project name (will be created)
+pages_project_name = "eztrip-web"
+
+# Production branch for automatic deployments
+pages_production_branch = "main"
+
+# GitHub repository owner (your username or organization)
+github_repo_owner = "your-github-username"
+
+# GitHub repository name
+github_repo_name = "eztrip"
+
+# Enable Cloudflare Web Analytics
+enable_web_analytics = true
