@@ -155,3 +155,30 @@ a {
     text-decoration: underline;
   }
 }
+
+// Override disabled button styles for better visibility on dark backgrounds
+:root {
+  @include mat.button-overrides(
+    (
+      filled-disabled-container-color: rgba(255, 255, 255, 0.12),
+      filled-disabled-label-text-color: rgba(255, 255, 255, 0.38),
+      outlined-disabled-label-text-color: rgba(255, 255, 255, 0.38),
+      outlined-disabled-outline-color: rgba(255, 255, 255, 0.12),
+      text-disabled-label-text-color: rgba(255, 255, 255, 0.38),
+      tonal-disabled-container-color: rgba(255, 255, 255, 0.12),
+      tonal-disabled-label-text-color: rgba(255, 255, 255, 0.38),
+      protected-disabled-container-color: rgba(255, 255, 255, 0.12),
+      protected-disabled-label-text-color: rgba(255, 255, 255, 0.38),
+    )
+  );
+
+  // Elevate card background to differentiate from page background
+  @include mat.card-overrides(
+    (
+      elevated-container-color: #1b263b,
+      outlined-container-color: #1b263b,
+      filled-container-color: #1b263b,
+      outlined-outline-color: rgba(255, 255, 255, 0.12),
+    )
+  );
+}

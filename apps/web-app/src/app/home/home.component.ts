@@ -1,22 +1,14 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { map, take, switchMap } from 'rxjs/operators';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
-import { GraphqlService } from '../core/graphql/graphql.service';
-import {
-  CURRENT_USER_QUERY,
-  type CurrentUserQuery,
-} from '../core/graphql/queries/user.queries';
-import {
-  TRIP_SUGGESTION_QUERY,
-  type TripSuggestionQuery,
-  type TripSuggestionVariables,
-} from '../core/graphql/queries/trip.queries';
-import type { User } from '../models/user.model';
+import { AuthService } from '../core/auth/auth.service';
+import { UserService } from '../core/services/user.service';
+import { TripService } from '../core/services/trip.service';
 
 @Component({
   selector: 'eztrip-home',
@@ -34,11 +26,11 @@ import type { User } from '../models/user.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent {
-  private readonly graphql = inject(GraphqlService);
+  private readonly auth = inject(AuthService);
+  private readonly userService = inject(UserService);
+  private readonly tripService = inject(TripService);
 
   promptText = '';
-  aiResponse = '';
-  isLoading = false;
 
   readonly suggestions = [
     { icon: '🏖️', label: 'Beach getaway' },
@@ -47,16 +39,14 @@ export class HomeComponent {
     { icon: '🎢', label: 'Theme park fun' },
   ];
 
-  readonly currentUser$ = this.graphql
-    .query<CurrentUserQuery, void>(CURRENT_USER_QUERY)
-    .pipe(
-      map((res) => res.currentUser as User | null),
-      tap((u) => console.log('currentUser:', u)),
-      shareReplay({ bufferSize: 1, refCount: true }),
-    );
+  readonly isAuthenticated$ = this.auth.isAuthenticated$;
+  readonly currentUser = this.userService.currentUser;
+  readonly userLoading = this.userService.loading;
+  readonly tripSuggestion = this.tripService.suggestion;
+  readonly tripLoading = this.tripService.loading;
 
-  readonly greeting$ = this.currentUser$.pipe(
-    map((user) => {
+  readonly greeting$ = this.isAuthenticated$.pipe(
+    map((isAuth) => {
       const hour = new Date().getHours();
       let timeGreeting = 'Hello';
 
@@ -64,13 +54,16 @@ export class HomeComponent {
       else if (hour < 18) timeGreeting = 'Good afternoon';
       else timeGreeting = 'Good evening';
 
+      if (!isAuth) return timeGreeting;
+
+      const user = this.currentUser();
       const name = user?.firstName || 'there';
       return `${timeGreeting}, ${name}`;
     }),
   );
 
   constructor() {
-    this.currentUser$.subscribe();
+    this.userService.fetchCurrentUser().subscribe();
   }
 
   useSuggestion(suggestion: { icon: string; label: string }): void {
@@ -81,30 +74,24 @@ export class HomeComponent {
   submitPrompt(): void {
     if (!this.promptText.trim()) return;
 
-    this.isLoading = true;
+    this.auth.isAuthenticated$
+      .pipe(
+        take(1),
+        switchMap((isAuth) => {
+          if (!isAuth) {
+            return this.auth.loginWithRedirect({
+              appState: { target: '/' },
+            });
+          }
 
-    this.graphql
-      .query<TripSuggestionQuery, TripSuggestionVariables>(
-        TRIP_SUGGESTION_QUERY,
-        {
-          prompt: this.promptText,
-        },
+          return this.tripService.generateSuggestion(this.promptText);
+        }),
       )
-      .subscribe({
-        next: (res) => {
-          this.aiResponse = res.tripSuggestion;
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Failed to get trip suggestion:', err);
-          this.aiResponse = 'Sorry, something went wrong. Please try again.';
-          this.isLoading = false;
-        },
-      });
+      .subscribe();
   }
 
   clearResponse(): void {
-    this.aiResponse = '';
+    this.tripService.clearSuggestion();
     this.promptText = '';
   }
 }

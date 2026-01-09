@@ -1,6 +1,6 @@
 <div class="home">
   <main class="home__content">
-    @if (!aiResponse && !isLoading) {
+    @if (!tripSuggestion() && !tripLoading()) {
       <!-- Welcome State -->
       <div class="home__welcome">
         <div class="home__greeting">
@@ -17,13 +17,13 @@
             placeholder="Describe your dream trip..."
             rows="1"
             (keydown.enter)="$event.preventDefault(); submitPrompt()"
-            [disabled]="isLoading"
+            [disabled]="tripLoading()"
           ></textarea>
           <button
             mat-icon-button
             class="home__prompt-submit"
             (click)="submitPrompt()"
-            [disabled]="isLoading || !promptText.trim()"
+            [disabled]="tripLoading() || !promptText.trim()"
             aria-label="Submit"
           >
             <mat-icon>send</mat-icon>
@@ -46,7 +46,7 @@
       </div>
     }
 
-    @if (isLoading) {
+    @if (tripLoading()) {
       <!-- Loading State -->
       <div class="home__loading">
         <mat-spinner diameter="40"></mat-spinner>
@@ -54,14 +54,14 @@
       </div>
     }
 
-    @if (aiResponse) {
+    @if (tripSuggestion()) {
       <!-- Response -->
       <div class="home__response">
         <div class="home__response-header">
           <mat-icon>auto_awesome</mat-icon>
           <span>AI Suggestion</span>
         </div>
-        <div class="home__response-content">{{ aiResponse }}</div>
+        <div class="home__response-content">{{ tripSuggestion() }}</div>
         <div class="home__response-actions">
           <button mat-stroked-button (click)="clearResponse()">
             <mat-icon>refresh</mat-icon>

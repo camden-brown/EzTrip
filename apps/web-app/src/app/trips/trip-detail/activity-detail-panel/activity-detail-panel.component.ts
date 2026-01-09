@@ -9,9 +9,9 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DateTime } from 'luxon';
-import { Activity } from '../../../models/trip.model';
-import { CategoryIconPipe } from '../../../pipes/category-icon.pipe';
-import { CategoryLabelPipe } from '../../../pipes/category-label.pipe';
+import { Activity } from '../../../core/models/trip.model';
+import { CategoryIconPipe } from '../../../core/pipes/category-icon.pipe';
+import { CategoryLabelPipe } from '../../../core/pipes/category-label.pipe';
 
 @Component({
   selector: 'eztrip-activity-detail-panel',

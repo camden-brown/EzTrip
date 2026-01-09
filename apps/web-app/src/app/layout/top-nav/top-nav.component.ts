@@ -33,12 +33,21 @@ import { AuthService } from '../../core/auth/auth.service';
 export class TopNavComponent {
   private readonly auth = inject(AuthService);
 
+  readonly isAuthenticated$ = this.auth.isAuthenticated$;
   notificationCount = 3;
+
+  onLogin(): void {
+    this.auth
+      .loginWithRedirect({
+        appState: { target: '/' },
+      })
+      .subscribe();
+  }
 
   onLogout(): void {
     this.auth
       .logout({
-        logoutParams: { returnTo: window.location.origin + '/auth' },
+        logoutParams: { returnTo: window.location.origin + '/signup' },
       })
       .subscribe();
   }

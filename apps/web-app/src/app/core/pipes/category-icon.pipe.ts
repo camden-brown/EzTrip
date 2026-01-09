@@ -1,8 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import {
-  ActivityCategory,
-  CategoryIcon,
-} from '../models/trip.model';
+import { ActivityCategory, CategoryIcon } from '../models/trip.model';
 
 @Pipe({
   name: 'categoryIcon',

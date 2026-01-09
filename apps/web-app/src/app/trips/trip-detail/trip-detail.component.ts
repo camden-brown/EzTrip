@@ -4,7 +4,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DateTime } from 'luxon';
-import { Activity } from '../../models/trip.model';
+import { Activity } from '../../core/models/trip.model';
 import { TripService } from '../trip.service';
 import { DaySectionComponent } from './day-section/day-section.component';
 import { AiPromptSheetComponent } from './ai-prompt-sheet/ai-prompt-sheet.component';

@@ -11,7 +11,7 @@ import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { DateTime } from 'luxon';
-import { ItineraryDay, Activity } from '../../../models/trip.model';
+import { ItineraryDay, Activity } from '../../../core/models/trip.model';
 import { ActivityCardComponent } from '../activity-card/activity-card.component';
 
 @Component({

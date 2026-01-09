@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { GraphqlService } from '../core/graphql/graphql.service';
 import { GET_TRIPS, GET_TRIP, GET_ACTIVITY } from './trip.queries';
-import { Trip, Activity } from '../models/trip.model';
+import { Trip, Activity } from '../core/models/trip.model';
 
 interface GetTripsResponse {
   trips: Trip[];

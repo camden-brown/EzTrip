@@ -14,7 +14,7 @@ export const authGuard = () => {
     take(1),
     map((isAuthenticated) => {
       if (!isAuthenticated) {
-        router.navigate(['/auth']);
+        router.navigate(['/signup']);
         return false;
       }
       return true;

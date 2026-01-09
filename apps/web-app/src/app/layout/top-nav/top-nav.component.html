@@ -7,50 +7,63 @@
   </div>
 
   <div class="nav-right">
-    <!-- Trips -->
-    <a
-      mat-icon-button
-      routerLink="/trips"
-      aria-label="My trips"
-      class="nav-icon-btn"
-    >
-      <mat-icon fontSet="material-symbols-outlined">travel_luggage_and_bags</mat-icon>
-    </a>
-
-    <!-- Notifications -->
-    <button
-      mat-icon-button
-      [matMenuTriggerFor]="notificationsMenu"
-      aria-label="Notifications"
-      class="nav-icon-btn"
-    >
-      <mat-icon
-        [matBadge]="notificationCount"
-        matBadgeColor="warn"
-        matBadgeSize="small"
-        [matBadgeHidden]="notificationCount === 0"
-        aria-hidden="false"
+    @if (isAuthenticated$ | async) {
+      <!-- Authenticated User Menu -->
+      <!-- Trips -->
+      <a
+        mat-icon-button
+        routerLink="/trips"
+        aria-label="My trips"
+        class="nav-icon-btn"
       >
-        notifications
-      </mat-icon>
-    </button>
+        <mat-icon fontSet="material-symbols-outlined">travel_luggage_and_bags</mat-icon>
+      </a>
 
-    <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
-      <eztrip-notifications [notificationCount]="notificationCount" />
-    </mat-menu>
+      <!-- Notifications -->
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="notificationsMenu"
+        aria-label="Notifications"
+        class="nav-icon-btn"
+      >
+        <mat-icon
+          [matBadge]="notificationCount"
+          matBadgeColor="warn"
+          matBadgeSize="small"
+          [matBadgeHidden]="notificationCount === 0"
+          aria-hidden="false"
+        >
+          notifications
+        </mat-icon>
+      </button>
 
-    <!-- User Profile -->
-    <button
-      mat-icon-button
-      [matMenuTriggerFor]="userMenu"
-      class="user-menu-trigger"
-      aria-label="User menu"
-    >
-      <mat-icon>person</mat-icon>
-    </button>
+      <mat-menu #notificationsMenu="matMenu" class="notifications-menu">
+        <eztrip-notifications [notificationCount]="notificationCount" />
+      </mat-menu>
 
-    <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
-      <eztrip-profile-menu (logout)="onLogout()" />
-    </mat-menu>
+      <!-- User Profile -->
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="userMenu"
+        class="user-menu-trigger"
+        aria-label="User menu"
+      >
+        <mat-icon>person</mat-icon>
+      </button>
+
+      <mat-menu #userMenu="matMenu" class="user-menu" xPosition="before">
+        <eztrip-profile-menu (logout)="onLogout()" />
+      </mat-menu>
+    } @else {
+      <!-- Guest Menu -->
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="onLogin()"
+        aria-label="Log in"
+      >
+        Log in
+      </button>
+    }
   </div>
 </mat-toolbar>
