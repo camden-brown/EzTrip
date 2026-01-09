@@ -1,0 +1,16 @@
+# Auth0 Configuration (Single Tenant, Multiple Applications)
+# Copy this file to terraform.tfvars and fill in your values
+# NEVER commit terraform.tfvars to git (it's in .gitignore)
+
+# Auth0 domain
+auth0_domain = "eztrip.us.auth0.com"
+
+# API identifiers (audiences)
+dev_api_identifier  = "https://api-dev.ez-trip.ai"
+prod_api_identifier = "https://api.ez-trip.ai"
+
+# Production domain
+production_domain = "ez-trip.ai"
+
+# Application name
+app_name = "EzTrip"

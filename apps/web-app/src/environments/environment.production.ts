@@ -12,10 +12,10 @@ export const environment = {
    */
   auth0: {
     domain: 'eztrip.us.auth0.com',
-    clientId: '8gQ8nnbeHrzzLgMLER5I81tUlJsDY5E9',
+    clientId: 'zpnPxpqpJXv6LEgpoEEuU7gCPHuzVhwd',
     authorizationParams: {
-      redirect_uri: 'https://eztrip.com',
-      audience: 'https://eztrip.us.auth0.com/api/v2/',
+      redirect_uri: 'https://ez-trip.ai',
+      audience: 'https://api.ez-trip.ai',
     },
     httpInterceptor: {
       allowedList: ['/graphql', '/api/*'],

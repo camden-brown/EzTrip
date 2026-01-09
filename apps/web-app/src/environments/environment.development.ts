@@ -14,10 +14,10 @@ export const environment = {
    */
   auth0: {
     domain: 'eztrip.us.auth0.com',
-    clientId: '8gQ8nnbeHrzzLgMLER5I81tUlJsDY5E9',
+    clientId: 'PEPjBZTore2LYDAP658tL0AW6ScUJEt9',
     authorizationParams: {
       redirect_uri: 'http://localhost:4200',
-      audience: 'https://eztrip.us.auth0.com/api/v2/',
+      audience: 'https://api-dev.ez-trip.ai',
     },
     httpInterceptor: {
       allowedList: ['/api-go/*'],
